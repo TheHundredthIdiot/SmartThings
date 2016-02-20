@@ -631,7 +631,7 @@ def poll() {
 				child?.sendEvent(name: 'temperature', 	value: (String.format("%.${decimalUnits}f", cToPref(data['Temperature']) as float)), unit: settings.tempUnits)
 				child?.sendEvent(name: 'carbonDioxide', value: data['CO2'])
 				child?.sendEvent(name: 'humidity', 		value: data['Humidity'])
-				child?.sendEvent(name: 'pressure', 		value: (String.format("%.${decimalUnits}f", mbarToPref(data['Pressure']) as float))+'\n'+settings.pressUnits, unit: settings.pressUnits)
+				child?.sendEvent(name: 'pressure', 		value: (String.format("%.${decimalUnits}f", pressToPref(data['Pressure']) as float))+'\n'+settings.pressUnits, unit: settings.pressUnits)
 				child?.sendEvent(name: 'noise', 		value: data['Noise'])
 		        child?.sendEvent(name: 'units',		    value: settings.tempUnits)
 				break;
@@ -686,7 +686,7 @@ def cToPref(temp) {
 	}
 }
 
-def mbarToPref(pressure) {
+def pressToPref(pressure) {
 	log.debug "In mbarToPref"
 
 	switch (settings.pressUnits) {
@@ -717,15 +717,15 @@ def rainToPref(rain) {
 def windToPref(wind) {
 	log.debug "In windToPref"
 	switch(settings.windUnits) {
+    	case 'kph':
+	        return wind
+            break;
 		case 'mph':
-			return wind
+			return wind * 0.621371
 			break;
     	case 'fps':
 	        return wind * 1.46667
         	break;
-    	case 'kph':
-	        return wind * 1.60934
-            break;
     	case 'mps':
        		return wind * 0.44704
             break;
@@ -740,7 +740,9 @@ def windToPref(wind) {
 
 def windToBeaufort(miles) {
 	log.debug "In windToBeaufort"
-    if (miles <= 0.9999) {
+//	Convert to mph to aligh with original Beaufort scale
+	miles = miles * 0.621371 
+	if (miles < 1) {
     	return 0
     }    
     int wholeMiles = miles
