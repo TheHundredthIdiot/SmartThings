@@ -41,15 +41,10 @@ metadata {
 	tiles (scale: 2)  {
 		multiAttributeTile(name:"WindStrength", type:"lighting", width: 6, height: 4, decoration: "flat") {
 			tileAttribute("device.WindStrength", key: "PRIMARY_CONTROL") {
-				attributeState "default",  label: '${currentValue}', icon: "st.Weather.weather1", backgroundColor: "#153591"
+				attributeState "default",  label: '${currentValue}', icon: "st.Weather.weather1", backgroundColor: "#7eaacd"
  			}
-         	tileAttribute("device.units", key: "SECONDARY_CONTROL") {
-             	attributeState "default", label:'${currentValue}'
-                attributeState "mph", label:'Miles per Hour (${currentValue})'
-             	attributeState "kph", label:'Kilometres per Hour (${currentValue})' 
-             	attributeState "fps", label:'Feet per Second (${currentValue})' 
-             	attributeState "mps", label:'Metres per Second (${currentValue})'
-             	attributeState "kn",  label:'Knots (${currentValue})' 
+         	tileAttribute("device.Beaufort", key: "SECONDARY_CONTROL") {
+             	attributeState "default", label: '${currentValue} Beaufort'
 			}
  		}
 		valueTile("Beaufort", "device.Beaufort", width: 1, height: 1) {
