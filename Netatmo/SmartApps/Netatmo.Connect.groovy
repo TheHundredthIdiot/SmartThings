@@ -15,7 +15,7 @@
  *
  *		https://community.smartthings.com/t/netatmo-for-uk-users-temp-workaround/27000
  *		https://en.wikipedia.org/wiki/Beaufort_scale
- *		http://climate.umn.edu/snow_fence/components/winddirectionanddegreeswithouttable3.htm
+ *		https://en.wikipedia.org/wiki/Points_of_the_compass
  *
  */
  
@@ -629,7 +629,7 @@ def poll() {
 				child?.sendEvent(name: 'temperature', 	value: (String.format("%.${decimalUnits}f", cToPref(data['Temperature']) as float)), unit: getTemperatureScale())
 				child?.sendEvent(name: 'carbonDioxide', value: data['CO2'])
 				child?.sendEvent(name: 'humidity', 		value: data['Humidity'])
-				child?.sendEvent(name: 'pressure', 		value: (String.format("%.${decimalUnits}f", pressToPref(data['Pressure']) as float))+'\n'+settings.pressUnits, unit: settings.pressUnits)
+				child?.sendEvent(name: 'pressure', 		value: (String.format("%.${decimalUnits}f", pressToPref(data['Pressure']) as float))+' '+settings.pressUnits, unit: settings.pressUnits)
 				child?.sendEvent(name: 'noise', 		value: data['Noise'])
 				break;
 			case 'NAModule1':
@@ -639,7 +639,8 @@ def poll() {
 				break;
 			case 'NAModule2':
 				log.debug "Updating NAModule2 $data"
-				child?.sendEvent(name: 'WindAngle',			value: windDirection(data['WindAngle'])+'\n('+data['WindAngle']+'°)')
+				child?.sendEvent(name: 'WindAngle',				value: data['WindAngle'])
+                child?.sendEvent(name: 'WindAngleText',			value: windDirection(data['WindAngle']))
 				child?.sendEvent(name: 'WindStrength',			value: (String.format("%.${decimalUnits}f", windToPref(data['WindStrength']) as float))+" "+settings.windUnits, unit: settings.windUnits)
 				child?.sendEvent(name: 'GustStrength', 			value: (String.format("%.${decimalUnits}f", windToPref(data['GustStrength']) as float))+" "+settings.windUnits, unit: settings.windUnits)
 				child?.sendEvent(name: 'Beaufort',     			value: Math.round(windToBeaufort(data['WindStrength']) as float), unit: 'bf')
@@ -778,56 +779,104 @@ def windToBeaufort(miles) {
 def windDirection(degrees) {
 	log.debug "In windDirection"
     switch(degrees) {
-		case 0..11:
-			return 'N'
+		case 0..5:
+			return degrees+'° - North (N)'
 			break;
-		case 12..33:
-			return 'NNE'
+		case 5..16:
+			return degrees+'° - North by East (NbE)'
 			break;
-		case 34..56:
-			return 'NE'
+		case 16..28:
+			return degrees+'° - North-northeast (NNE)'
 			break;
-		case 57..78:
-			return 'ENE'
+		case 28..39:
+			return degrees+'° - Northeast by North (NEbN)'
 			break;
-		case 79..101:
-			return 'E'
+		case 39..50:
+			return degrees+'° - Northeast (NE)'
 			break;
-		case 102..123:
-			return 'ESE'
+		case 50..61:
+			return degrees+'° - Northeast by East (NEbE)'
 			break;
-		case 124..146:
-			return 'SE'
+		case 61..73:
+			return degrees+'° - East-northeast (ENE)'
 			break;
-		case 147..168:
-			return 'SSE'
+		case 73..84:
+			return degrees+'° - East by North (EbN)'
 			break;
-		case 169..191:
-			return 'S'
+		case 84..95:
+			return degrees+'° - East (E)'
 			break;
-		case 192..213:
-			return 'SSW'
+		case 95..106:
+			return degrees+'° - East by South (EbS)'
 			break;
-		case 214..236:
-			return 'SW'
+		case 106..118:
+			return degrees+'° - East-southeast (ESE)'
 			break;
-		case 237..258:
-			return 'WSW'
+		case 118..129:
+			return degrees+'° - Southeast by East (SEbE)'
 			break;
-		case 259..281:
-			return 'W'
+		case 129..140:
+			return degrees+'° - Southeast (SE)'
 			break;
-		case 282..303:
-			return 'WNW'
+		case 140..151:
+			return degrees+'° - Southeast by South (SEbS)'
 			break;
-		case 304..326:
-			return 'NW'
+		case 151..163:
+			return degrees+'° - South-southeast (SSE)'
 			break;
-		case 327..347:
-			return 'NNW'
+		case 163..174:
+			return degrees+'° - South by East (SbE)'
 			break;
-		case 348..360:
-			return 'N'
+		case 174..185:
+			return degrees+'° - South (S)'
+			break;
+		case 185..196:
+			return degrees+'° - South by West (SbW)'
+			break;
+		case 196..208:
+			return degrees+'° - South-southwest (SSW)'
+			break;
+		case 208..219:
+			return degrees+'° - Southwest by South (SWbS)'
+			break;
+		case 219..230:
+			return degrees+'° - Southwest (SW)'
+			break;
+		case 230..241:
+			return degrees+'° - Southwest by West (SWbW)'
+			break;
+		case 241..253:
+			return degrees+'° - West-southwest (WSW)'
+			break;
+		case 253..264:
+			return degrees+'° - West by South (WbS)'
+			break;
+		case 264..275:
+			return degrees+'° - West (W)'
+			break;
+		case 275..286:
+			return degrees+'° - West by North (WbN)'
+			break;
+		case 286..298:
+			return degrees+'° - West-northwest (WNW)'
+			break;
+		case 298..309:
+			return degrees+'° - Northwest by West (NWbW)'
+			break;
+		case 309..320:
+			return degrees+'° - Northwest (NW)'
+			break;
+		case 320..331:
+			return degrees+'° - Northwest by North (NWbN)'
+			break;
+		case 331..343:
+			return degrees+'° - North-northwest (NNW)'
+			break;
+		case 343..354:
+			return degrees+'° - North by West (NbW)'
+			break;
+		case 354..360:
+			return degrees+'° - North (N)'
 			break;
 	}
 }           
