@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
  *
@@ -521,7 +521,6 @@ def selectDefaultPreferences() {
 	if (devicePresent != 0) {
 		dynamicPage(name: "listDevices", title: "Preferences", install: false, nextPage: "selectAdditionalPreferences") {
 			section("Device prefernces") {
-				input "tempUnits", "enum", title: "Report temperature in", description: "Temperature Measurement", required: true, options: ['C':'Centigrade (°C)', 'F':'Fahrenheit (°F)', 'S':'Set by SmartThings (°'+getTemperatureScale()+')']
 				input "pressUnits", "enum", title: "Report pressure in", description: "Pressure Measurement", required: true, options: ['bar':'Bar (bar)', 'mbar':'Millibar (mbar)', 'inHg':'Inch Mercury (inHg)', 'mmHg':'Millimeter Mercury (mmHg)']
 				input "decimalUnits", "enum", title: "Round device measurements to", description: "Decimal accuracy", required: true, options: [0:'Integer', 1:'1 Decimal Place', 2:'2 Decimal Places', 3:'3 Decimal Places', 4:'4 Decimal Places']
 			}
@@ -529,7 +528,6 @@ def selectDefaultPreferences() {
 	} else {
 		dynamicPage(name: "listDevices", title: "Preferences", install: true) {
 			section("Device preferences") {
-				input "tempUnits", "enum", title: "Report temperature in", description: "Temperature Measurement", required: true, options: ['C':'Centigrade (°C)', 'F':'Fahrenheit (°F)', 'S':'Set by SmartThings (°'+getTemperatureScale()+')']
 				input "pressUnits", "enum", title: "Report pressure in", description: "Pressure Measurement", required: true, options: ['bar':'Bar (bar)', 'mbar':'Millibar (mbar)', 'inHg':'Inch Mercury (inHg)', 'mmHg':'Millimeter Mercury (mmHg)']
 				input "decimalUnits", "enum", title: "Round device measurements to", description: "Decimal accuracy", required: true, options: [0:'Integer', 1:'1 Decimal Place', 2:'2 Decimal Places', 3:'3 Decimal Places', 4:'4 Decimal Places']
 			}
@@ -559,10 +557,10 @@ def selectAdditionalPreferences() {
 	if (devicePresent == 1) {
 		dynamicPage(name: "selectAdditionalPreferences", title: "Additional Preferences", install: true) {
     		section("Wind Gauge") {
- 			input "windUnits", "enum", title: "Report wind in", description: "Wind speed measurement", required: true, options: ['mph':'Miles per Hour (mph)', 'kph':'Kilometres per Hour (kph)', 'fps':'Feet per Second (fps)', 'mps':'Metre per Second (mps)', 'kn':'Knots (kn)', 'bf':'Beaufort (bf)']
- 		       	input "beaufortDescription", "enum", title: "Beaufort description for", required: true, options: ['Land':'Land', 'Sea':'Sea']
-			}
+ 			input "windUnits", "enum", title: "Report wind in", description: "Wind speed measurement", required: true, options: ['mph':'Miles per Hour (mph)', 'kph':'Kilometres per Hour (kph)', 'fps':'Feet per Second (fps)', 'mps':'Metre per Second (mps)', 'kn':'Knots (kn)']
+ 		    input "beaufortDescription", "enum", title: "Beaufort description for", required: true, options: ['Land':'Land', 'Sea':'Sea']
 		}
+	}
 	} else if (devicePresent == 2) {
 		dynamicPage(name: "selectAdditionalPreferences", title: "Additional Preferences", install: true) {
     		section("Rain Gauage") {
@@ -572,9 +570,9 @@ def selectAdditionalPreferences() {
 	} else if (devicePresent == 3) {
 		dynamicPage(name: "selectAdditionalPreferences", title: "Additional Preferences", install: true) {
     		section("Wind and Rain Gauges") {
- 			input "windUnits", "enum", title: "Report wind in", description: "Wind speed measurement", required: true, options: ['mph':'Miles per Hour (mph)', 'kph':'Kilometres per Hour (kph)', 'fps':'Feet per Second (fps)', 'mps':'Metre per Second (mps)', 'kn':'Knots (kn)', 'bf':'Beaufort (bf)']
- 		       	input "beaufortDescription", "enum", title: "Beaufort description for", required: true, options: ['Land':'Land', 'Sea':'Sea']
-        		input "rainUnits", "enum", title: "Report rain in", description: "Millimetres or Inches", required: true, options: ['mm':'Millimetres (mm)', 'in':'Inches (in)']
+ 			input "windUnits", "enum", title: "Report wind in", description: "Wind speed measurement", required: true, options: ['mph':'Miles per Hour (mph)', 'kph':'Kilometres per Hour (kph)', 'fps':'Feet per Second (fps)', 'mps':'Metre per Second (mps)', 'kn':'Knots (kn)']
+ 		    input "beaufortDescription", "enum", title: "Beaufort description for", required: true, options: ['Land':'Land', 'Sea':'Sea']
+        	input "rainUnits", "enum", title: "Report rain in", description: "Millimetres or Inches", required: true, options: ['mm':'Millimetres (mm)', 'in':'Inches (in)']
 			}
     	}
     }    
@@ -628,41 +626,38 @@ def poll() {
 		switch(detail.type) {
 			case 'NAMain':
 				log.debug "Updating NAMain $data"
-				child?.sendEvent(name: 'temperature', 	value: (String.format("%.${decimalUnits}f", cToPref(data['Temperature']) as float)), unit: settings.tempUnits)
+				child?.sendEvent(name: 'temperature', 	value: (String.format("%.${decimalUnits}f", cToPref(data['Temperature']) as float)), unit: getTemperatureScale())
 				child?.sendEvent(name: 'carbonDioxide', value: data['CO2'])
-				child?.sendEvent(name: 'humidity', 	value: data['Humidity'])
-				child?.sendEvent(name: 'pressure', 	value: (String.format("%.${decimalUnits}f", pressToPref(data['Pressure']) as float))+'\n'+settings.pressUnits, unit: settings.pressUnits)
-				child?.sendEvent(name: 'noise', 	value: data['Noise'])
-		        	child?.sendEvent(name: 'units',		value: settings.tempUnits)
+				child?.sendEvent(name: 'humidity', 		value: data['Humidity'])
+				child?.sendEvent(name: 'pressure', 		value: (String.format("%.${decimalUnits}f", pressToPref(data['Pressure']) as float))+'\n'+settings.pressUnits, unit: settings.pressUnits)
+				child?.sendEvent(name: 'noise', 		value: data['Noise'])
 				break;
 			case 'NAModule1':
 				log.debug "Updating NAModule1 $data"
-				child?.sendEvent(name: 'temperature', 	value: (String.format("%.${decimalUnits}f", cToPref(data['Temperature']) as float)), unit: settings.tempUnits)
-				child?.sendEvent(name: 'humidity',	value: data['Humidity'])
-		        child?.sendEvent(name: 'units',		  	value: settings.tempUnits)
+				child?.sendEvent(name: 'temperature', 	value: (String.format("%.${decimalUnits}f", cToPref(data['Temperature']) as float)), unit: getTemperatureScale())
+				child?.sendEvent(name: 'humidity',		value: data['Humidity'])
 				break;
 			case 'NAModule2':
 				log.debug "Updating NAModule2 $data"
-				child?.sendEvent(name: 'WindAngle',		value: windDirection(data['WindAngle'])+'\n('+data['WindAngle']+'°)')
-				child?.sendEvent(name: 'WindStrength',		value: (String.format("%.${decimalUnits}f", windToPref(data['WindStrength']) as float)), unit: settings.windUnits)
-				child?.sendEvent(name: 'GustStrength', 		value: (String.format("%.${decimalUnits}f", windToPref(data['GustStrength']) as float)), unit: settings.windUnits)
-				child?.sendEvent(name: 'Beaufort',     		value: Math.round(windToBeaufort(data['WindStrength']) as float), unit: 'bf')
-                		child?.sendEvent(name: 'BeaufortDescription',	value: Math.round(windToBeaufort(data['WindStrength']) as float)+" "+beaufortDescription)
-		        	child?.sendEvent(name: 'units',			value: settings.windUnits)
+				child?.sendEvent(name: 'WindAngle',			value: windDirection(data['WindAngle'])+'\n('+data['WindAngle']+'°)')
+				child?.sendEvent(name: 'WindStrength',			value: (String.format("%.${decimalUnits}f", windToPref(data['WindStrength']) as float))+" "+settings.windUnits, unit: settings.windUnits)
+				child?.sendEvent(name: 'GustStrength', 			value: (String.format("%.${decimalUnits}f", windToPref(data['GustStrength']) as float))+" "+settings.windUnits, unit: settings.windUnits)
+				child?.sendEvent(name: 'Beaufort',     			value: Math.round(windToBeaufort(data['WindStrength']) as float), unit: 'bf')
+                child?.sendEvent(name: 'BeaufortDescription',	value: Math.round(windToBeaufort(data['WindStrength']) as float)+" "+settings.beaufortDescription)
+		        child?.sendEvent(name: 'units',					value: settings.windUnits)
  				break;
             		case 'NAModule3':
 				log.debug "Updating NAModule3 $data"
-				child?.sendEvent(name: 'rain', 		value: (String.format("%.${decimalUnits}f", rainToPref(data['Rain']) as float)), unit: settings.rainUnits)
-				child?.sendEvent(name: 'rainSumHour', 	value: (String.format("%.${decimalUnits}f", rainToPref(data['sum_rain_1']) as float)), unit: settings.rainUnits)
-				child?.sendEvent(name: 'rainSumDay',  	value: (String.format("%.${decimalUnits}f", rainToPref(data['sum_rain_24']) as float)), unit: settings.rainUnits)
-				child?.sendEvent(name: 'units', 	value: settings.rainUnits)
+				child?.sendEvent(name: 'rain', 			value: (String.format("%.${decimalUnits}f", rainToPref(data['Rain']) as float))+" "+settings.rainUnits, unit: settings.rainUnits)
+				child?.sendEvent(name: 'rainSumHour', 	value: (String.format("%.${decimalUnits}f", rainToPref(data['sum_rain_1']) as float))+" "+settings.rainUnits, unit: settings.rainUnits)
+				child?.sendEvent(name: 'rainSumDay',  	value: (String.format("%.${decimalUnits}f", rainToPref(data['sum_rain_24']) as float))+" "+settings.rainUnits, unit: settings.rainUnits)
+				child?.sendEvent(name: 'units', 		value: settings.rainUnits)
 				break;
 			case 'NAModule4':
 				log.debug "Updating NAModule4 $data"
-				child?.sendEvent(name: 'temperature', 	value: (String.format("%.${decimalUnits}f", cToPref(data['Temperature']) as float)), unit: settings.tempUnits)
+				child?.sendEvent(name: 'temperature', 	value: (String.format("%.${decimalUnits}f", cToPref(data['Temperature']) as float)), unit: getTemperatureScale())
 				child?.sendEvent(name: 'carbonDioxide', value: data['CO2'])
-				child?.sendEvent(name: 'humidity',	value: data['Humidity'])
-		        	child?.sendEvent(name: 'units',		value: settings.tempUnits)
+				child?.sendEvent(name: 'humidity',		value: data['Humidity'])
 				break;
     		}
 	}
@@ -670,18 +665,10 @@ def poll() {
 
 def cToPref(temp) {
 	log.debug "In cToPref"
-	if (settings.tempUnits == 'S') {
-		if(getTemperatureScale() == 'C') {
-    		return temp
-    	} else {
-			return (temp * 1.8) + 32
-		}
+    if(getTemperatureScale() == 'C') {
+    	return temp
     } else {
-    	if (settings.tempUnits == 'C') {
-    		return temp
-    	} else {
-			return (temp * 1.8) + 32
-        }    
+		return (temp * 1.8) + 32
 	}
 }
 
@@ -731,9 +718,9 @@ def windToPref(wind) {
     	case 'kn':
         	return wind * 0.868976
  		break;
-    	case 'bf':
-        	return windToBeaufort(wind)
-            	break;
+//    	case 'bf':
+//        	return windToBeaufort(wind)
+//         	break;
 	}
 }
 
