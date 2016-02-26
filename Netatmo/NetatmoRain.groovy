@@ -32,27 +32,53 @@ metadata {
 	}
 
 	tiles (scale: 2)  {
-		multiAttributeTile(name:"rain", type:"lighting", width: 6, height: 4, canChangeIcon: true) {
-			tileAttribute("device.rainSumHour", key: "PRIMARY_CONTROL") {
-				attributeState "0.0",  label: '${currentValue}/h', icon: "st.Weather.weather12", backgroundColor: "#44b621"
-				attributeState "default",  label: '${currentValue}/h', icon: "st.Weather.weather12", backgroundColor: "#7eaacd"
- 			}
-        	tileAttribute("device.units", key: "SECONDARY_CONTROL") {
-	   			attributeState "default", label:'${currentValue}'
-                attributeState "mm", label:'${currentValue} - Millimetres'
-             	attributeState "in", label:'${currentValue} - Inches' 
-            }
+		valueTile("rain", "device.rainSumHour", width: 6, height: 4) {
+          	state "0.0 mm",  label:'${currentValue}', backgroundColor: "#c8daea", icon: "st.Weather.weather12"
+          	state "0.1 mm",  label:'${currentValue}', backgroundColor: "#b6cee2", icon: "st.Weather.weather12"
+          	state "0.2 mm",  label:'${currentValue}', backgroundColor: "#a3c2db", icon: "st.Weather.weather12"
+          	state "0.3 mm",  label:'${currentValue}', backgroundColor: "#91b6d4", icon: "st.Weather.weather12"
+          	state "0.4 mm",  label:'${currentValue}', backgroundColor: "#7ea9cd", icon: "st.Weather.weather5"
+          	state "0.5 mm",  label:'${currentValue}', backgroundColor: "#6c9dc6", icon: "st.Weather.weather5"
+          	state "0.6 mm",  label:'${currentValue}', backgroundColor: "#5a91bf", icon: "st.Weather.weather5"
+          	state "0.7 mm",  label:'${currentValue}', backgroundColor: "#4785b8", icon: "st.Weather.weather5"
+          	state "0.8 mm",  label:'${currentValue}', backgroundColor: "#4682b4", icon: "st.Weather.weather5"
+          	state "1.9 mm",  label:'${currentValue}', backgroundColor: "#4077a5", icon: "st.Weather.weather5"
+          	state "1.0 mm",  label:'${currentValue}', backgroundColor: "#396a93", icon: "st.Weather.weather5"
+          	state "1.1 mm",  label:'${currentValue}', backgroundColor: "#325d81", icon: "st.Weather.weather5"
+          	state "1.2 mm",  label:'${currentValue}', backgroundColor: "#2b506e", icon: "st.Weather.weather5"
+          	state "1.3 mm",  label:'${currentValue}', backgroundColor: "#24425c", icon: "st.Weather.weather5"
+          	state "1.4 mm",  label:'${currentValue}', backgroundColor: "#1d3549", icon: "st.Weather.weather5"
+          	state "1.5 mm",  label:'${currentValue}', backgroundColor: "#152837", icon: "st.Weather.weather5"
+          	state "1.6 mm",  label:'${currentValue}', backgroundColor: "#0e1b25", icon: "st.Weather.weather5"
+          	state "1.7 mm",  label:'${currentValue}', backgroundColor: "#070d12", icon: "st.Weather.weather10"
+			state "0.00 in", label:'${currentValue}', backgroundColor: "#c8daea", icon: "st.Weather.weather12"
+          	state "0.04 in", label:'${currentValue}', backgroundColor: "#b6cee2", icon: "st.Weather.weather12"
+          	state "0.12 in", label:'${currentValue}', backgroundColor: "#a3c2db", icon: "st.Weather.weather12"
+          	state "0.16 in", label:'${currentValue}', backgroundColor: "#91b6d4", icon: "st.Weather.weather12"
+          	state "0.20 in", label:'${currentValue}', backgroundColor: "#7ea9cd", icon: "st.Weather.weather5"
+          	state "0.24 in", label:'${currentValue}', backgroundColor: "#6c9dc6", icon: "st.Weather.weather5"
+          	state "0.25 in", label:'${currentValue}', backgroundColor: "#5a91bf", icon: "st.Weather.weather5"
+          	state "0.30 in", label:'${currentValue}', backgroundColor: "#4785b8", icon: "st.Weather.weather5"
+          	state "0.34 in", label:'${currentValue}', backgroundColor: "#4682b4", icon: "st.Weather.weather5"
+          	state "0.38 in", label:'${currentValue}', backgroundColor: "#4077a5", icon: "st.Weather.weather5"
+          	state "0.42 in", label:'${currentValue}', backgroundColor: "#396a93", icon: "st.Weather.weather5"
+          	state "0.46 in", label:'${currentValue}', backgroundColor: "#325d81", icon: "st.Weather.weather5"
+            state "0.50 in", label:'${currentValue}', backgroundColor: "#2b506e", icon: "st.Weather.weather5"
+            state "0.54 in", label:'${currentValue}', backgroundColor: "#24425c", icon: "st.Weather.weather5"
+            state "0.58 in", label:'${currentValue}', backgroundColor: "#1d3549", icon: "st.Weather.weather5"
+            state "0.62 in", label:'${currentValue}', backgroundColor: "#152837", icon: "st.Weather.weather5"
+            state "0.66 in", label:'${currentValue}', backgroundColor: "#0e1b25", icon: "st.Weather.weather5"
+            state "0.72 in", label:'${currentValue}', backgroundColor: "#070d12", icon: "st.Weather.weather10"
  		}
- 		valueTile("rainSumDay", "device.rainSumDay", width: 2, height: 2) {
- 			state "0.0",  label: 'Cumulative\n${currentValue}/h', backgroundColor: "#44b621"
-            state "default", label: 'Cumulative\n${currentValue}', backgroundColor: "#7eaacd"
+ 		valueTile("rainSumDay", "device.rainSumDay", width: 5, height: 1, decoration: "flat") {
+            state "default", label: 'Cumulative rainfall: ${currentValue}'
  		}
- 		standardTile("refresh", "device.rain", width: 2, height: 2, decoration: "flat") {
+ 		standardTile("refresh", "device.rain", width: 1, height: 1, decoration: "flat") {
  			state "default", action:"refresh.poll", icon:"st.secondary.refresh"
  		}
 
-		main (["rain", "rainSumHour", "rainSumDay"])
- 		details(["rain", "rainSumHour", "rainSumDay", "refresh"])
+		main (["rain"])
+ 		details(["rain", "rainSumDay", "refresh"])
 	}
 }
 
