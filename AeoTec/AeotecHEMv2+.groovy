@@ -65,7 +65,7 @@ metadata {
 
 	preferences {
         input "kWhCost", "string", title: "Cost per kWh (default 0.10)", required: true, defaultValue: "0.10"
-		input "costUnits", "enum", title: "Report cost in", required: true, options: ['£':'Pounds (£)', '€':'Euros (€)', '$':'Dollars ($)']
+		input "costUnits", "enum", title: "Report cost in", required: true, options: ['Â£':'Pounds (Â£)', 'â‚¬':'Euros (â‚¬)', '$':'Dollars ($)']
    		input "kWhDelay", "number", title: "kWh report interval (default 120s)", required: true, defaultValue: 120
     	input "detailDelay", "number", title: "Detail report interval (default 30s)", required: true, defaultValue: 30
 	}
@@ -330,7 +330,6 @@ def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCmdEncap 
 							[name: "energyOne", value: dispValue, unit: "", descriptionText: "L1 Energy: ${formattedValue} kWh"]
 						}
 						else {
-                        	[name: "energyOne", value: state.energyValueDisp, unit: "kWh", descriptionText: "Total Energy: ${state.energyValueDisp}"]
 						}
 					}
 				}
