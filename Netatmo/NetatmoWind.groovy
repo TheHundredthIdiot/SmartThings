@@ -35,22 +35,21 @@ metadata {
 		// TODO: define status and reply messages here
 	}
 
-    preferences {
+	preferences {
 	}
 
 	tiles (scale: 2)  {
-		multiAttributeTile(name:"WindStrength", type:"lighting", width: 6, height: 4, decoration: "flat", canChangeIcon: true) {
+		multiAttributeTile(name:"WindStrength", type:"lighting", width: 6, height: 4, decoration: "flat") {
 			tileAttribute("device.WindStrength", key: "PRIMARY_CONTROL") {
 				attributeState "default",  label: '${currentValue}', icon: "st.Weather.weather1", backgroundColor: "#153591"
  			}
          	tileAttribute("device.units", key: "SECONDARY_CONTROL") {
              	attributeState "default", label:'${currentValue}'
-                attributeState "mph", label:'${currentValue} - Miles per Hour'
-             	attributeState "kph", label:'${currentValue} - Kilometres per Hour' 
-             	attributeState "fps", label:'${currentValue} - Feet per Second' 
-             	attributeState "mps", label:'${currentValue} - Metre per Second'
-             	attributeState "kn",  label:'${currentValue} - Knots' 
-             	attributeState "bf", label:'${currentValue} - Beaufort'      			  
+                attributeState "mph", label:'Miles per Hour (${currentValue})'
+             	attributeState "kph", label:'Kilometres per Hour (${currentValue})' 
+             	attributeState "fps", label:'Feet per Second (${currentValue})' 
+             	attributeState "mps", label:'Metres per Second (${currentValue})'
+             	attributeState "kn",  label:'Knots (${currentValue})' 
 			}
  		}
 		valueTile("Beaufort", "device.Beaufort", width: 1, height: 1) {
@@ -111,7 +110,7 @@ metadata {
  			state "default", action:"refresh.poll", icon:"st.secondary.refresh"
  		}
 
-		main (["WindStrength", "WindAngle", "GustStrength"])
+		main (["WindStrength"])
 		details(["WindStrength", "Beaufort", "BeaufortDescription", "WindAngle", "GustStrength", "refresh"])
 	}
 }
