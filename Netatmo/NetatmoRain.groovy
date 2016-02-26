@@ -78,7 +78,7 @@ metadata {
  		}
 
 		main (["rain"])
- 		details(["rain", "rainSumDay", "refresh"])
+ 		details(["rain", "refresh", "rainSumDay"])
 	}
 }
 
