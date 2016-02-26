@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
  *
@@ -35,19 +35,15 @@ metadata {
 	tiles (scale: 2)  {
 		multiAttributeTile(name: "temperature", type:"lighting", width: 6, height: 4, decoration: "flat", canChangeIcon: true) {
 			tileAttribute("device.temperature", key: "PRIMARY_CONTROL") {
-				attributeState "default",  label: '${currentValue}°', icon: "st.Home.home1", backgroundColor: "#153591"
+				attributeState "default",  label: '${currentValue}°', icon: "st.Home.home1", backgroundColor: "#7eaacd"
  			}
-         	tileAttribute("device.units", key: "SECONDARY_CONTROL") {
-                attributeState "C", label: '°C - Centigrade'
-             	attributeState "F", label: '°F - Fahrenheit' 
-             	attributeState "S", label: 'Set by SmartThings' 
- 			}
+         	tileAttribute("device.humidity", key: "SECONDARY_CONTROL") {
+                attributeState "humidity", label:'${currentValue}% Humidity'
+  			}
         }
- 		valueTile("humidity", "device.humidity", width: 2, height: 2) {
- 			state "humidity", label:'${currentValue}%', unit:"Humidity"
- 		}
- 		valueTile("carbonDioxide", "device.carbonDioxide", width: 2, height: 2) {
- 			state "carbonDioxide", label:'${currentValue}ppm', unit:"CO2", backgroundColors: [
+
+		valueTile("carbonDioxide", "device.carbonDioxide", width: 1, height: 1) {
+ 			state "carbonDioxide", label:'', unit:"CO2", backgroundColors: [
  				[value: 250, 	color: "#cbf3be"],
             	[value: 350, 	color: "#85e368"],
             	[value: 600, 	color: "#44B621"],
@@ -56,17 +52,67 @@ metadata {
                 [value: 50000, 	color: "#cc3300"]
  				]
 		}
- 		valueTile("noise", "device.noise", width: 2, height: 2) {
- 			state "noise", label:'${currentValue}db', unit:"Noise"
+ 		valueTile("carbonDioxideText", "device.carbonDioxide", width: 5, height: 1, decoration: "flat") {
+ 			state "carbonDioxide", label:'Carbon Dioxide level: ${currentValue} ppm', unit:"CO2"
+		}
+
+		valueTile("noise", "device.noise", width: 1, height: 1) {
+ 			state "noise", label:'', unit:"Noise", backgroundColors: [
+  				[value: 0, 		color: "#a8ff80"],                
+  				[value: 70, 	color: "#c6ff99"],
+  				[value: 75, 	color: "#ddffb3"],
+  				[value: 80, 	color: "#ededed"],
+  				[value: 85, 	color: "#ffd9d9"],
+  				[value: 90, 	color: "#ffc7c7"],
+  				[value: 95, 	color: "#ffb3b3"],
+  				[value: 105, 	color: "#ff8c8c"],
+  				[value: 120, 	color: "#ff6666"],
+  				[value: 140, 	color: "#ff0000"],
+  				[value: 180, 	color: "#000000"]
+ 				]
  		}
- 		valueTile("pressure", "device.pressure", width: 2, height: 2) {
- 			state "pressure", label:'${currentValue}', unit:"Pressure"
+ 		valueTile("noiseText", "device.noise", width: 5, height: 1, decoration: "flat") {
+  			state "default", label: 'Noise level: ${currentValue} dB'
+            state "0",  	 label: 'Noise level: ${currentValue} dB\nThe threshold of hearing'                                                                     
+  			state "10",  	 label: 'Noise level: ${currentValue} dB\nNormal breathing'
+  			state "20",  	 label: 'Noise level: ${currentValue} dB\nRustling leaves' 
+  			state "30",  	 label: 'Noise level: ${currentValue} dB\nQuiet office or library'	 
+  			state "40",  	 label: 'Noise level: ${currentValue} dB\nResidential background noise, light rainfall'	 
+  			state "50",  	 label: 'Noise level: ${currentValue} dB\nDishwasher'
+  			state "55",  	 label: 'Noise level: ${currentValue} dB\nAverage office noise'	 
+  			state "60",  	 label: 'Noise level: ${currentValue} dB\nNormal conversation,vacuum cleaner'	 
+  			state "70",  	 label: 'Noise level: ${currentValue} dB\nAlarm clock, busy street'	
+  			state "75",  	 label: 'Noise level: ${currentValue} dB\nMain road traffic at 30mph'
+  			state "77",  	 label: 'Noise level: ${currentValue} dB\n2nd floor flat in town centre'	 
+  			state "80",  	 label: 'Noise level: ${currentValue} dB\nLocal construction activity, diesel train at 100ft'	 
+  			state "87",  	 label: 'Noise level: ${currentValue} dB\n3rd floor flat on a major road'        	 
+  			state "90",  	 label: 'Noise level: ${currentValue} dB\nHeavy goods vehicle'	 
+  			state "97",  	 label: 'Noise level: ${currentValue} dB\nJet preparing to land'
+  			state "100", 	 label: 'Noise level: ${currentValue} dB\nElectric drill, beside a mainline railway'	 
+  			state "110", 	 label: 'Noise level: ${currentValue} dB\nLive rock music, chainsaw, car horn'	 
+  			state "120", 	 label: 'Noise level: ${currentValue} dB\nAeroplane on the runway, emergency services siren'
+  			state "130", 	 label: 'Noise level: ${currentValue} dB\nPneumatic drill'	 
+  			state "140", 	 label: 'Noise level: ${currentValue} dB\nFireworks'
+  			state "155", 	 label: 'Noise level: ${currentValue} dB\nRifle shot'
+  			state "160", 	 label: 'Noise level: ${currentValue} dB\nTurbojet engine, shotgun'	 	 
+  			state "165", 	 label: 'Noise level: ${currentValue} dB\n.357 magnum revolver'	 	 
+  			state "170", 	 label: 'Noise level: ${currentValue} dB\nSafety airbag'
+  			state "175", 	 label: 'Noise level: ${currentValue} dB\nHowitzer cannon'	 	 
+  			state "180", 	 label: 'Noise level: ${currentValue} dB\nRocket launch'	         	
+  			state "194", 	 label: 'Noise level: ${currentValue} dB\nSound waves become shock waves'
+		}
+
+		valueTile("pressure", "device.pressure", width: 5, height: 1, decoration: "flat") {
+ 			state "pressure", label:'Pressure: ${currentValue}', unit:"Pressure"
  		}
- 		standardTile("refresh", "device.pressure", width: 2, height: 2, decoration: "flat") {
+ 		standardTile("refresh", "device.pressure", width: 1, height: 1, decoration: "flat") {
  			state "default", action:"device.poll", icon:"st.secondary.refresh"
  		}
- 		main(["temperature", "humidity", "carbonDioxide", "noise", "pressure"])
- 		details(["temperature", "humidity", "carbonDioxide", "noise", "pressure", "refresh"])
+ 		main(["temperature"])
+ 		details(["temperature",
+        		 "carbonDioxide", "carbonDioxideText", 
+                 "noise", "noiseText", 
+                 "refresh", "pressure"])
 	}
 }
 
