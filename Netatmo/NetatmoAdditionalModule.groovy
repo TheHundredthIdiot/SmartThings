@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
  *
@@ -33,19 +33,15 @@ metadata {
 	tiles (scale: 2)  {
 		multiAttributeTile(name: "temperature", type:"lighting", width: 6, height: 4, decoration: "flat", canChangeIcon: true) {
 			tileAttribute("device.temperature", key: "PRIMARY_CONTROL") {
-				attributeState "default",  label: '${currentValue}°', icon: "st.Home.home1", backgroundColor: "#153591"
+				attributeState "default",  label: '${currentValue}°', icon: "st.Home.home1", backgroundColor: "#7eaacd"
  			}
-         	tileAttribute("device.units", key: "SECONDARY_CONTROL") {
-                attributeState "C", label: '°C - Centigrade'
-             	attributeState "F", label: '°F - Fahrenheit' 
-             	attributeState "S", label: 'Set by SmartThings' 
- 			}
+         	tileAttribute("device.humidity", key: "SECONDARY_CONTROL") {
+                attributeState "humidity", label:'${currentValue}% Humidity'
+  			}
         }
- 		valueTile("humidity", "device.humidity", width: 2, height: 2) {
- 			state "humidity", label:'${currentValue}%', unit:"Humidity"
- 		}
- 		valueTile("carbonDioxide", "device.carbonDioxide", width: 2, height: 2) {
- 			state "carbonDioxide", label:'${currentValue}ppm', unit:"CO2", backgroundColors: [
+		
+        valueTile("carbonDioxide", "device.carbonDioxide", width: 1, height: 1) {
+ 			state "carbonDioxide", label:'', unit:"CO2", backgroundColors: [
  				[value: 250, 	color: "#cbf3be"],
             	[value: 350, 	color: "#85e368"],
             	[value: 600, 	color: "#44B621"],
@@ -53,12 +49,22 @@ metadata {
                 [value: 2000, 	color: "#e86d13"],
                 [value: 50000, 	color: "#cc3300"]
  				]
-        }
- 		standardTile("refresh", "device.pressure", width: 2, height: 2, decoration: "flat") {
+		}
+ 		valueTile("carbonDioxideText", "device.carbonDioxide", width: 5, height: 1, decoration: "flat") {
+ 			state "carbonDioxide", label:'Carbon Dioxide level: ${currentValue} ppm', unit:"CO2"
+		}
+		valueTile("void", "void", width: 5, height: 1, decoration: "flat") {
+ 			state "default", label:''
+ 		}
+        
+        standardTile("refresh", "device.pressure", width: 1, height: 1, decoration: "flat") {
  			state "default", action:"device.poll", icon:"st.secondary.refresh"
  		}
- 		main "temperature"
- 		details(["temperature", "humidity", "carbonDioxide", "refresh"])
+ 		
+        main "temperature"
+ 		details(["temperature",
+        		 "carbonDioxide", "carbonDioxideText", 
+                 "refresh", "void"])
 	}
 }
 
