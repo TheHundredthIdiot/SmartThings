@@ -93,20 +93,37 @@ metadata {
             state "12 Sea",  label: 'Huge waves, sea is completely white\nwith foam and spray, air is filled with\ndriving spray, greatly reducing visibility'
   	 	}
     
-		valueTile("WindAngle", "device.WindAngle", width: 2, height: 2) {
- 			state "default", label: '${currentValue}'
+		valueTile("WindAngle", "device.WindAngle", width: 1, height: 1) {
+ 			state "default", label: '', backgroundColors: [
+            		[value: "0",   color: "#b30000"],
+					[value: "6",   color: "#e60000"],
+					[value: "16",  color: "#e6b800"],
+					[value: "163", color: "#fff5cc"],
+					[value: "175", color: "#ffffff"],
+					[value: "186", color: "#fff5cc"],			
+					[value: "197", color: "#e6b800"],
+					[value: "264", color: "#ffe066"],
+					[value: "276", color: "#e6b800"],
+					[value: "298", color: "#e60000"],
+					[value: "309", color: "#e6b800"],
+					[value: "354", color: "#b30000"]]
+ 		}
+		valueTile("WindAngleText", "device.WindAngleText", width: 5, height: 1, decoration: "flat") {
+ 			state "default", label: 'Wind: ${currentValue}'
  		}
 
-		valueTile("GustStrength", "device.GustStrength", width: 2, height: 2) {
- 			state "default", label:'Gusting\nto ${currentValue}'
+		valueTile("GustStrength", "device.GustStrength", width: 5, height: 1, decoration: "flat") {
+ 			state "default", label:'Gusting to: ${currentValue}'
  		}
-        
- 		standardTile("refresh", "device.wind", width: 2, height: 2, decoration: "flat") {
+		standardTile("refresh", "device.wind", width: 1, height: 1, decoration: "flat") {
  			state "default", action:"refresh.poll", icon:"st.secondary.refresh"
  		}
 
 		main (["WindStrength"])
-		details(["WindStrength", "Beaufort", "BeaufortDescription", "WindAngle", "GustStrength", "refresh"])
+		details(["WindStrength", 
+        		 "Beaufort", "BeaufortDescription", 
+                 "WindAngle", "WindAngleText", 
+                 "refresh", "GustStrength"])
 	}
 }
 
