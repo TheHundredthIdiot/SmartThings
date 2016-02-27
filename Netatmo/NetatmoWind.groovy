@@ -15,6 +15,7 @@
  *
  *		https://community.smartthings.com/t/netatmo-for-uk-users-temp-workaround/27000
  *		https://en.wikipedia.org/wiki/Beaufort_scale
+ *		https://en.wikipedia.org/wiki/Points_of_the_compass
  *
  */
 
@@ -95,18 +96,39 @@ metadata {
     
 		valueTile("WindAngle", "device.WindAngle", width: 1, height: 1) {
  			state "default", label: '', backgroundColors: [
-            		[value: "0",   color: "#b30000"],
-					[value: "6",   color: "#e60000"],
-					[value: "16",  color: "#e6b800"],
-					[value: "163", color: "#fff5cc"],
-					[value: "175", color: "#ffffff"],
-					[value: "186", color: "#fff5cc"],			
-					[value: "197", color: "#e6b800"],
-					[value: "264", color: "#ffe066"],
-					[value: "276", color: "#e6b800"],
-					[value: "298", color: "#e60000"],
-					[value: "309", color: "#e6b800"],
-					[value: "354", color: "#b30000"]]
+                [value: "0",   color: "#ff0000"], // North (N)
+                [value: "6",   color: "#ff9d80"], // North by East (NbE)
+                [value: "17",  color: "#daa520"], // North-northeast (NNE)
+                [value: "29",  color: "#daa520"], // Northeast by North (NEbN)
+                [value: "40",  color: "#daa520"], // Northeast (NE)
+                [value: "51",  color: "#daa520"], // Northeast by East (NEbE)
+                [value: "62",  color: "#daa520"], // East-northeast (ENE)
+                [value: "74",  color: "#daa520"], // East by North (EbN)
+                [value: "85",  color: "#daa520"], // East (E)
+                [value: "96",  color: "#daa520"], // East by South (EbS)
+                [value: "107", color: "#daa520"], // East-southeast (ESE)
+                [value: "119", color: "#daa520"], // Southeast by East (SEbE)
+                [value: "130", color: "#daa520"], // Southeast (SE)
+                [value: "141", color: "#daa520"], // Southeast by South (SEbS)
+                [value: "152", color: "#daa520"], // South-southeast (SSE)
+                [value: "164", color: "#f8eed3"], // South by East (SbE)
+                [value: "175", color: "#000000"], // South (S)
+                [value: "186", color: "#f8eed3"], // South by West (SbW)
+                [value: "197", color: "#daa520"], // South-southwest (SSW)
+                [value: "209", color: "#daa520"], // Southwest by South (SWbS)
+                [value: "220", color: "#daa520"], // Southwest (SW)
+                [value: "231", color: "#daa520"], // Southwest by West (SWbW)
+                [value: "242", color: "#daa520"], // West-southwest (WSW)
+                [value: "254", color: "#e6c300"], // West by South (WbS)
+                [value: "265", color: "#ffd700"], // West (W)
+                [value: "276", color: "#e6c300"], // West by North (WbN)
+                [value: "287", color: "#daa520"], // West-northwest (WNW)
+                [value: "299", color: "#daa520"], // Northwest by West (NWbW)
+                [value: "310", color: "#daa520"], // Northwest (NW)
+                [value: "321", color: "#daa520"], // Northwest by North (NWbN)
+                [value: "332", color: "#daa520"], // North-northwest (NNW)
+                [value: "344", color: "#ff9d80"], // North by West (NbW)
+                [value: "355", color: "#ff0000"]] // North (N)
  		}
 		valueTile("WindAngleText", "device.WindAngleText", width: 5, height: 1, decoration: "flat") {
  			state "default", label: 'Wind: ${currentValue}'
