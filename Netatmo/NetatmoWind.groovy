@@ -21,6 +21,9 @@
 
 metadata {
 	definition (name: "My Netatmo Wind", namespace: "TheHundredthIdiot", author: "Andy") {
+    
+    	capability "Sensor"
+    
 		attribute "wind", "number"
         attribute "WindAngle", "string"
         attribute "WindStrength", "number"
