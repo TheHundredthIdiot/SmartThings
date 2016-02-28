@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
  *
@@ -21,7 +21,8 @@ metadata {
 	definition (name: "My Fibaro Motion Sensor", namespace: "TheHundredthIdiot", author: "Andy") {
 
         attribute   "needUpdate", "string"
-
+		
+        capability  "Sensor"
         capability  "Acceleration Sensor"
         capability  "Battery"
         capability  "Configuration"
