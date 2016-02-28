@@ -219,13 +219,17 @@ def zwaveEvent(physicalgraph.zwave.commands.meterv1.MeterReport cmd) {
         		formattedValue = String.format("%1.2f", newValue)
 				dispValue = "${formattedValue}\nkWh"
                 state.energyValueDisp = "${formattedValue}\nkWh"
-                sendEvent(name: "energyOne", value: dispValue as String, unit: "", descriptionText: "Display Energy: ${newValue} kWh", displayed: false)
+                if (state.display == 1) { 
+                	sendEvent(name: "energyOne", value: dispValue as String, unit: "", descriptionText: "Display Energy: ${newValue} kWh", displayed: false) 
+                }
                 state.energyValue = newValue
                 BigDecimal costDecimal = newValue * ( kWhCost as BigDecimal )
                 def costDisplay = String.format("%1.2f",costDecimal)
                 state.costDisp = "Cost\n${settings.costUnits}"+costDisplay
-                if (state.display == 1) { sendEvent(name: "energyTwo", value: state.costDisp, unit: "", descriptionText: "Display Cost: ${settings.costUnits}${costDisp}", displayed: false) }
-                [name: "energy", value: newValue, unit: "kWh", descriptionText: "Total Energy: ${formattedValue} kWh"]
+                if (state.display == 1) { 
+                	sendEvent(name: "energyTwo", value: state.costDisp, unit: "", descriptionText: "Display Cost: ${settings.costUnits}${costDisp}", displayed: false) 
+                	[name: "energy", value: newValue, unit: "kWh", descriptionText: "Total Energy: ${formattedValue} kWh"]
+                }
             }
 		} 
 		else if (cmd.scale==2) {				
@@ -235,13 +239,17 @@ def zwaveEvent(physicalgraph.zwave.commands.meterv1.MeterReport cmd) {
 	   			dispValue = newValue+"\nWatts"
                 if (newValue < state.powerLow) {
                 	dispValue = newValue+" Watts\n"+dateString
-                	if (state.display == 1) { sendEvent(name: "powerOne", value: dispValue as String, unit: "", descriptionText: "Lowest Power: ${newValue} Watts")	}
+                	if (state.display == 1) { 
+                    	sendEvent(name: "powerOne", value: dispValue as String, unit: "", descriptionText: "Lowest Power: ${newValue} Watts")
+                    }
                     state.powerLow = newValue
                     state.powerLowDisp = dispValue
                 }
                 if (newValue > state.powerHigh) {
                 	dispValue = newValue+" Watts\n"+dateString
-                	if (state.display == 1) { sendEvent(name: "powerTwo", value: dispValue as String, unit: "", descriptionText: "Highest Power: ${newValue} Watts")	}
+                	if (state.display == 1) { 
+                    	sendEvent(name: "powerTwo", value: dispValue as String, unit: "", descriptionText: "Highest Power: ${newValue} Watts")
+                    }
                     state.powerHigh = newValue
                     state.powerHighDisp = dispValue
                 }
@@ -258,13 +266,17 @@ def zwaveEvent(physicalgraph.zwave.commands.meterv1.MeterReport cmd) {
     			dispValue = "${formattedValue}\nVolts"
                 if (newValue < state.voltsLow) {
                 	dispValue = formattedValue+" Volts\n"+dateString                	
-                	if (state.display == 1) { sendEvent(name: "voltsOne", value: dispValue as String, unit: "", descriptionText: "Lowest Voltage: ${formattedValue} Volts")	}
+                	if (state.display == 1) { 
+                    	sendEvent(name: "voltsOne", value: dispValue as String, unit: "", descriptionText: "Lowest Voltage: ${formattedValue} Volts")
+                    }
                     state.voltsLow = newValue
                     state.voltsLowDisp = dispValue
                 }
                 if (newValue > state.voltsHigh) {
                     dispValue = formattedValue+" Volts\n"+dateString
-                	if (state.display == 1) { sendEvent(name: "voltsTwo", value: dispValue as String, unit: "", descriptionText: "Highest Voltage: ${formattedValue} Volts") }
+                	if (state.display == 1) { 
+                    	sendEvent(name: "voltsTwo", value: dispValue as String, unit: "", descriptionText: "Highest Voltage: ${formattedValue} Volts") 
+                    }
                     state.voltsHigh = newValue
                     state.voltsHighDisp = dispValue
                 }                
@@ -281,13 +293,17 @@ def zwaveEvent(physicalgraph.zwave.commands.meterv1.MeterReport cmd) {
     			dispValue = "${formattedValue}\nAmps"
                 if (newValue < state.ampsLow) {
                 	dispValue = formattedValue+" Amps\n"+dateString
-                	if (state.display == 1) { sendEvent(name: "ampsOne", value: dispValue as String, unit: "", descriptionText: "Lowest Current: ${formattedValue} Amps") }
+                	if (state.display == 1) { 
+                    	sendEvent(name: "ampsOne", value: dispValue as String, unit: "", descriptionText: "Lowest Current: ${formattedValue} Amps") 
+                    }
                     state.ampsLow = newValue
                     state.ampsLowDisp = dispValue
                 }
                 if (newValue > state.ampsHigh) {
                 	dispValue = formattedValue+" Amps\n"+dateString
-                	if (state.display == 1) { sendEvent(name: "ampsTwo", value: dispValue as String, unit: "", descriptionText: "Highest Current: ${formattedValue} Amps") }
+                	if (state.display == 1) { 
+                    	sendEvent(name: "ampsTwo", value: dispValue as String, unit: "", descriptionText: "Highest Current: ${formattedValue} Amps") 
+                    }
                     state.ampsHigh = newValue
                     state.ampsHighDisp = dispValue
                 }                
@@ -323,12 +339,12 @@ def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCmdEncap 
 						}
 					}
 				} 
-				else if (encapsulatedCommand.scale == 1 ){
+				else if (encapsulatedCommand.scale == 0 ){
 					newValue = Math.round(encapsulatedCommand.scaledMeterValue * 100) / 100
 					formattedValue = String.format("%1.2f", newValue)
-					dispValue = "${formattedValue}\nkWh"
+					dispValue = "${formattedValue}\nkWh (L1)"
 					if (dispValue != state.energyL1Disp) {
-						state.energyL1Disp = dispValue+"\n"+(new Date().format("d/M/YY H:mm", location.timeZone))
+						state.energyL1Disp = dispValue
 						if (state.display == 2) {
 							[name: "energyOne", value: dispValue, unit: "", descriptionText: "L1 Energy: ${formattedValue} kWh"]
 						}
