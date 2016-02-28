@@ -16,12 +16,15 @@
 metadata {
 	definition (name: "My Aeon HEMv2+", namespace: "TheHundredthIdiot", author: "Andy") {
     
-    	capability "Energy Meter"
+    	capability "Actuator"
+        capability "Sensor"
+        capability "Energy Meter"
 		capability "Power Meter"
 		capability "Configuration"
 		capability "Sensor"
         capability "Refresh"
         capability "Polling"
+//      capability "Voltage Measurement"
         
         attribute "energy", "string"
         attribute "power", "string"
@@ -303,14 +306,14 @@ def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCmdEncap 
     def MAX_WATTS = 24000
 
    	if (cmd.commandClass == 50) {    
-   		def encapsulatedCommand = cmd.encapsulatedCommand([0x30: 1, 0x31: 1]) 		// Can specify command class versions here like in zwave.parse
+   		def encapsulatedCommand = cmd.encapsulatedCommand([0x30: 1, 0x31: 1]) 
 		if (encapsulatedCommand) {
 			if (cmd.sourceEndPoint == 1) {
 				if (encapsulatedCommand.scale == 2 ) {
 					newValue = Math.round(encapsulatedCommand.scaledMeterValue)
                     if (newValue > MAX_WATTS) { return }
 					formattedValue = newValue as String
-					dispValue = "${formattedValue}\nWatts"
+					dispValue = "${formattedValue}\nWatts (L1)"
 					if (dispValue != state.powerL1Disp) {
 						state.powerL1Disp = dispValue
 						if (state.display == 2) {
@@ -320,12 +323,12 @@ def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCmdEncap 
 						}
 					}
 				} 
-				else if (encapsulatedCommand.scale == 0 ){
+				else if (encapsulatedCommand.scale == 1 ){
 					newValue = Math.round(encapsulatedCommand.scaledMeterValue * 100) / 100
 					formattedValue = String.format("%1.2f", newValue)
 					dispValue = "${formattedValue}\nkWh"
 					if (dispValue != state.energyL1Disp) {
-						state.energyL1Disp = dispValue
+						state.energyL1Disp = dispValue+"\n"+(new Date().format("d/M/YY H:mm", location.timeZone))
 						if (state.display == 2) {
 							[name: "energyOne", value: dispValue, unit: "", descriptionText: "L1 Energy: ${formattedValue} kWh"]
 						}
@@ -337,7 +340,7 @@ def zwaveEvent(physicalgraph.zwave.commands.multichannelv3.MultiChannelCmdEncap 
 					newValue = Math.round(encapsulatedCommand.scaledMeterValue * 100) / 100
                     if (newValue > MAX_AMPS) { return }
 					formattedValue = String.format("%1.2f", newValue)
-					dispValue = "${formattedValue}\nAmps"
+					dispValue = "${formattedValue}\nAmps (L1)"
 					if (dispValue != state.ampsL1Disp) {
 						state.ampsL1Disp = dispValue
 						if (state.display == 2) {
@@ -525,7 +528,7 @@ def configure() {
 	if (dDelay == null) {
 		dDelay = 15
 	}
-    
+
 	def cmd = delayBetween([
 		zwave.configurationV1.configurationSet(parameterNumber: 3, size: 1, scaledConfigurationValue: 0).format(),			// Disable (=0) selective reporting
 //		zwave.configurationV1.configurationSet(parameterNumber: 4, size: 2, scaledConfigurationValue: 5).format(),			// Don't send whole HEM unless watts have changed by 30
