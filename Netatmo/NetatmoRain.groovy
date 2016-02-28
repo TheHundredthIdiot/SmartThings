@@ -19,6 +19,9 @@
 
 metadata {
 	definition (name: "My Netatmo Rain", namespace: "TheHundredthIdiot", author: "Andy") {
+
+		capability "Sensor"
+        
 		attribute "rain", "number"
         attribute "rainSumHour", "number"
         attribute "rainSumDay", "number"
