@@ -19,7 +19,9 @@
 
 metadata {
 	definition (name: "My Netatmo Outdoor Module", namespace: "TheHundredthIdiot", author: "Andy") {
-		capability "Relative Humidity Measurement"
+
+		capability "Sensor"
+        capability "Relative Humidity Measurement"
 		capability "Temperature Measurement"
 
         attribute "units", "string"
