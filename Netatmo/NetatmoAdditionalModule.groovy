@@ -19,6 +19,8 @@
 
 metadata {
 	definition (name: "My Netatmo Additional Module", namespace: "TheHundredthIdiot", author: "Andy") {
+
+		capability "Sensor"
 		capability "Relative Humidity Measurement"
 		capability "Temperature Measurement"
 
