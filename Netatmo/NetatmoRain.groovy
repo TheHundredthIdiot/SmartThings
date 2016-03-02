@@ -23,19 +23,27 @@ metadata {
 		capability "Sensor"
         
 		attribute "rain", "number"
-        attribute "rainSumHour", "number"
         attribute "rainSumDay", "number"
-        attribute "units", "string"
-        
-        command "poll"
+        attribute "rainSumHour", "number"
+		attribute "DecimalUnits", "string"
+
+        attribute "RainSumDayText", "string"
+		attribute "RainSumHourText", "string"
+
+		command "poll"
+        command "rainToPref"
 	}
 
 	simulator {
 		// TODO: define status and reply messages here
 	}
 
+	preferences {
+    	input "rainUnits", "enum", title: "Report rain in", description: "Millimetres or Inches", required: true, options: ['mm':'Millimetres (mm)', 'in':'Inches (in)']
+	}
+    
 	tiles (scale: 2)  {
-		valueTile("rain", "device.rainSumHour", width: 6, height: 4) {
+		valueTile("rain", "device.RainSumHourText", width: 6, height: 4) {
           	state "0.0 mm",  label:'${currentValue}', backgroundColor: "#c8daea", icon: "st.Weather.weather12"
           	state "0.1 mm",  label:'${currentValue}', backgroundColor: "#b6cee2", icon: "st.Weather.weather12"
           	state "0.2 mm",  label:'${currentValue}', backgroundColor: "#a3c2db", icon: "st.Weather.weather12"
@@ -73,17 +81,27 @@ metadata {
             state "0.66 in", label:'${currentValue}', backgroundColor: "#0e1b25", icon: "st.Weather.weather5"
             state "0.72 in", label:'${currentValue}', backgroundColor: "#070d12", icon: "st.Weather.weather10"
  		}
- 		valueTile("rainSumDay", "device.rainSumDay", width: 5, height: 1, decoration: "flat") {
+ 		valueTile("rainSumDay", "device.RainSumDayText", width: 5, height: 1, decoration: "flat") {
             state "default", label: 'Cumulative rainfall: ${currentValue}'
  		}
  		standardTile("refresh", "device.rain", width: 1, height: 1, decoration: "flat") {
- 			state "default", action:"refresh.poll", icon:"st.secondary.refresh"
+ 			state "default", action:"poll", icon:"st.secondary.refresh"
  		}
 
 		main (["rain"])
  		details(["rain", "refresh", "rainSumDay"])
 	}
 }
+
+def updated() {
+	log.debug ("updated")
+	rainToPref()
+}
+
+def installed() {
+	log.debug ("installed")
+    rainToPref()
+}    
 
 // parse events into attributes
 def parse(String description) {
@@ -92,4 +110,19 @@ def parse(String description) {
 
 def poll() {
 	parent.poll()
+}
+
+def rainToPref() {
+	log.debug "In rainToPref"
+   	def rainDay = 0 
+	def rainHour = 0
+    if(settings.rainUnits == 'mm') {
+    	rainDay = device.currentValue("rainSumDay")
+    	rainHour = device.currentValue("rainSumHour")
+    } else {
+    	rainDay = device.currentValue("rainSumDay") * 0.0393701
+    	rainHour = device.currentValue("rainSumHour") * 0.0393701
+    }
+   	sendEvent(name: "RainSumDayText", value: String.format("%.${device.currentValue("DecimalUnits")}f", rainDay as float) + " " + settings.rainUnits, unit: settings.rainUnits, descriptionText: "Rain in last day: ${rainDay}")
+   	sendEvent(name: "RainSumHourText", value: String.format("%.${device.currentValue("DecimalUnits")}f", rainHour as float) + " " + settings.rainUnits, unit: settings.rainUnits, descriptionText: "Rain in last hour: ${rainHour}")
 }
