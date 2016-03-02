@@ -49,10 +49,7 @@ definition(
 
 preferences {
 	page(name: "Credentials", title: "Fetch OAuth2 Credentials", content: "authPage", install: false)
-	page(name: "listDevices", title: "Netatmo Devices", content: "listDevices", install: false)
-    page(name: "selectDefaultPreferences", title: "Device Preferences", content: "selectDefaultPreferences", install: false)
-    page(name: "selectAdditionalPreferences", title: "Additional Preferences", content: "selectAdditionalPreferences", install: true)
-
+	page(name: "listDevices", title: "Netatmo Devices", content: "listDevices", install: true)
 }
 
 mappings {
@@ -492,90 +489,12 @@ def listDevices() {
 
 	def devices = getDeviceList()
 
-	dynamicPage(name: "listDevices", title: "Choose devices", install: false, nextPage: "selectDefaultPreferences") {
-		section("Devices") {
+	dynamicPage(name: "listDevices", title: "Choose devices", install: true) {
+		section {
 			input "devices", "enum", title: "Select Device(s)", required: false, multiple: true, options: devices
+			input "decimalUnits", "enum", title: "Round device measurements to", description: "Decimal accuracy", required: true, options: [0:'Integer', 1:'1 Decimal Place', 2:'2 Decimal Places', 3:'3 Decimal Places', 4:'4 Decimal Places']
 		}
 	}
-}
-
-def selectDefaultPreferences() {
-	log.debug("In selectDefaultPreferences")
-    
-	def devicePresent = 0 
-
-	settings.devices.each { deviceId ->
-		def detail = state.deviceDetail[deviceId]
-		switch(detail.type) {
-			case 'NAModule2':
-            	devicePresent = devicePresent + 1
-                log.debug "In DefaultPreferences Wind device found"
-                break
-			case 'NAModule3':
-				devicePresent = devicePresent + 2
-                log.debug "In DefaultPreferences Rain device found"
-                break
-        }
-    }
-
-	if (devicePresent != 0) {
-		dynamicPage(name: "listDevices", title: "Preferences", install: false, nextPage: "selectAdditionalPreferences") {
-			section("Device prefernces") {
-				input "pressUnits", "enum", title: "Report pressure in", description: "Pressure Measurement", required: true, options: ['bar':'Bar (bar)', 'mbar':'Millibar (mbar)', 'inHg':'Inch Mercury (inHg)', 'mmHg':'Millimeter Mercury (mmHg)']
-				input "decimalUnits", "enum", title: "Round device measurements to", description: "Decimal accuracy", required: true, options: [0:'Integer', 1:'1 Decimal Place', 2:'2 Decimal Places', 3:'3 Decimal Places', 4:'4 Decimal Places']
-			}
-		}
-	} else {
-		dynamicPage(name: "listDevices", title: "Preferences", install: true) {
-			section("Device preferences") {
-				input "pressUnits", "enum", title: "Report pressure in", description: "Pressure Measurement", required: true, options: ['bar':'Bar (bar)', 'mbar':'Millibar (mbar)', 'inHg':'Inch Mercury (inHg)', 'mmHg':'Millimeter Mercury (mmHg)']
-				input "decimalUnits", "enum", title: "Round device measurements to", description: "Decimal accuracy", required: true, options: [0:'Integer', 1:'1 Decimal Place', 2:'2 Decimal Places', 3:'3 Decimal Places', 4:'4 Decimal Places']
-			}
-        }
-    }
-}
-
-def selectAdditionalPreferences() {
-	log.debug "In selectAdditionalPreferences"
-
-	def devicePresent = 0 
-
-	settings.devices.each { deviceId ->
-		def detail = state.deviceDetail[deviceId]
-		switch(detail.type) {
-			case 'NAModule2':
-            	devicePresent = devicePresent + 1
-				log.debug "In selectAdditionalPreferences Wind device found"
-				break
-			case 'NAModule3':
-				devicePresent = devicePresent + 2
-				log.debug "In selectAdditionalPreferences Rain device found"
-				break
-        }
-    }
-
-	if (devicePresent == 1) {
-		dynamicPage(name: "selectAdditionalPreferences", title: "Additional Preferences", install: true) {
-    		section("Wind Gauge") {
- 			input "windUnits", "enum", title: "Report wind in", description: "Wind speed measurement", required: true, options: ['mph':'Miles per Hour (mph)', 'kph':'Kilometres per Hour (kph)', 'fps':'Feet per Second (fps)', 'mps':'Metre per Second (mps)', 'kn':'Knots (kn)']
- 		    input "beaufortDescription", "enum", title: "Beaufort description for", required: true, options: ['Land':'Land', 'Sea':'Sea']
-		}
-	}
-	} else if (devicePresent == 2) {
-		dynamicPage(name: "selectAdditionalPreferences", title: "Additional Preferences", install: true) {
-    		section("Rain Gauage") {
-        		input "rainUnits", "enum", title: "Report rain in", description: "Millimetres or Inches", required: true, options: ['mm':'Millimetres (mm)', 'in':'Inches (in)']
-			}
-		}
-	} else if (devicePresent == 3) {
-		dynamicPage(name: "selectAdditionalPreferences", title: "Additional Preferences", install: true) {
-    		section("Wind and Rain Gauges") {
- 			input "windUnits", "enum", title: "Report wind in", description: "Wind speed measurement", required: true, options: ['mph':'Miles per Hour (mph)', 'kph':'Kilometres per Hour (kph)', 'fps':'Feet per Second (fps)', 'mps':'Metre per Second (mps)', 'kn':'Knots (kn)']
- 		    input "beaufortDescription", "enum", title: "Beaufort description for", required: true, options: ['Land':'Land', 'Sea':'Sea']
-        	input "rainUnits", "enum", title: "Report rain in", description: "Millimetres or Inches", required: true, options: ['mm':'Millimetres (mm)', 'in':'Inches (in)']
-			}
-    	}
-    }    
 }
 
 def apiGet(String path, Map query, Closure callback) {
@@ -629,8 +548,10 @@ def poll() {
 				child?.sendEvent(name: 'temperature', 	value: (String.format("%.${decimalUnits}f", cToPref(data['Temperature']) as float)), unit: getTemperatureScale())
 				child?.sendEvent(name: 'carbonDioxide', value: data['CO2'])
 				child?.sendEvent(name: 'humidity', 		value: data['Humidity'])
-				child?.sendEvent(name: 'pressure', 		value: (String.format("%.${decimalUnits}f", pressToPref(data['Pressure']) as float))+' '+settings.pressUnits, unit: settings.pressUnits)
+				child?.sendEvent(name: 'pressure', 		value: data['Pressure'] as float)
 				child?.sendEvent(name: 'noise', 		value: data['Noise'])
+		        child?.sendEvent(name: 'DecimalUnits',	value: settings.decimalUnits)
+				child.updated()
 				break;
 			case 'NAModule1':
 				log.debug "Updating NAModule1 $data"
@@ -639,20 +560,19 @@ def poll() {
 				break;
 			case 'NAModule2':
 				log.debug "Updating NAModule2 $data"
-				child?.sendEvent(name: 'WindAngle',				value: data['WindAngle'])
-                child?.sendEvent(name: 'WindAngleText',			value: windDirection(data['WindAngle']))
-				child?.sendEvent(name: 'WindStrength',			value: (String.format("%.${decimalUnits}f", windToPref(data['WindStrength']) as float))+" "+settings.windUnits, unit: settings.windUnits)
-				child?.sendEvent(name: 'GustStrength', 			value: (String.format("%.${decimalUnits}f", windToPref(data['GustStrength']) as float))+" "+settings.windUnits, unit: settings.windUnits)
-				child?.sendEvent(name: 'Beaufort',     			value: Math.round(windToBeaufort(data['WindStrength']) as float), unit: 'bf')
-                child?.sendEvent(name: 'BeaufortDescription',	value: Math.round(windToBeaufort(data['WindStrength']) as float)+" "+settings.beaufortDescription)
-		        child?.sendEvent(name: 'units',					value: settings.windUnits)
+				child?.sendEvent(name: 'WindAngle',		value: data['WindAngle'])
+				child?.sendEvent(name: 'WindStrength',	value: data['WindStrength'] as float)
+				child?.sendEvent(name: 'GustStrength', 	value: data['GustStrength'] as float)
+		        child?.sendEvent(name: 'DecimalUnits',	value: settings.decimalUnits)
+                child.updated()
  				break;
-            		case 'NAModule3':
+       		case 'NAModule3':
 				log.debug "Updating NAModule3 $data"
-				child?.sendEvent(name: 'rain', 			value: (String.format("%.${decimalUnits}f", rainToPref(data['Rain']) as float))+" "+settings.rainUnits, unit: settings.rainUnits)
-				child?.sendEvent(name: 'rainSumHour', 	value: (String.format("%.${decimalUnits}f", rainToPref(data['sum_rain_1']) as float))+" "+settings.rainUnits, unit: settings.rainUnits)
-				child?.sendEvent(name: 'rainSumDay',  	value: (String.format("%.${decimalUnits}f", rainToPref(data['sum_rain_24']) as float))+" "+settings.rainUnits, unit: settings.rainUnits)
-				child?.sendEvent(name: 'units', 		value: settings.rainUnits)
+				child?.sendEvent(name: 'rain', 			value: data['Rain'])
+				child?.sendEvent(name: 'rainSumHour', 	value: data['sum_rain_1'] as float)
+				child?.sendEvent(name: 'rainSumDay',  	value: data['sum_rain_24'] as float)
+		        child?.sendEvent(name: 'DecimalUnits',	value: settings.decimalUnits)
+				child.updated()
 				break;
 			case 'NAModule4':
 				log.debug "Updating NAModule4 $data"
@@ -672,214 +592,6 @@ def cToPref(temp) {
 		return (temp * 1.8) + 32
 	}
 }
-
-def pressToPref(pressure) {
-	log.debug "In mbarToPref"
-
-	switch (settings.pressUnits) {
-    	case 'bar':
-        	return pressure * 0.001
-			break;        
-        case 'mbar':
-        	return pressure
-            break;
-        case 'inHg':
-        	return pressure * 0.0295301
-            break;
-        case 'mmHg':
-	   		return pressure * 0.750062
-			break;
-	}
-}    
-
-def rainToPref(rain) {
-	log.debug "In rainToPref"
-	if(settings.rainUnits == 'mm') {
-    	return rain
-    } else {
-    	return rain * 0.0393701
-    }
-}
-
-def windToPref(wind) {
-	log.debug "In windToPref"
-	switch(settings.windUnits) {
-    	case 'kph':
-		return wind
-            	break;
-	case 'mph':
-		return wind * 0.621371
-		break;
-    	case 'fps':
-	        return wind * 1.46667
-        	break;
-    	case 'mps':
-       		return wind * 0.44704
-            	break;
-    	case 'kn':
-        	return wind * 0.868976
- 		break;
-//    	case 'bf':
-//        	return windToBeaufort(wind)
-//         	break;
-	}
-}
-
-def windToBeaufort(miles) {
-	log.debug "In windToBeaufort"
-//	Convert to mph to align with original Beaufort scale measurement units (rather than kph)
-	miles = miles * 0.621371 
-	if (miles < 1) {
-    		return 0
-    	}    
-    	int wholeMiles = miles
-    	switch(wholeMiles) {
-		case 1..3:
-			return 1
- 			break;
-		case 4..7:
-			return 2 
- 			break;
- 		case 8..12:
-			return 3
- 			break;
- 		case 13..18:
-			return 4
- 			break;
- 		case 19..24:
-			return 5
- 			break;
- 		case 25..31:
-			return 6
- 			break;
- 		case 32..38:
-			return 7
- 			break;
- 		case 39..46:
-			return 8
- 			break;
- 		case 57..54:
-			return 9                   
- 			break;
- 		case 55..63:
-			return 10                   
- 			break;
- 		case 64..72:
-			return 11
- 			break;
-        	case 73..999:
-          		return 12
- 			break;
- 		default:
-           		return 0
- 			break;
-	}
-}           
-  
-def windDirection(degrees) {
-	log.debug "In windDirection"
-    switch(degrees) {
-		case 0..5:
-			return degrees+'° - North (N)'
-			break;
-		case 5..16:
-			return degrees+'° - North by East (NbE)'
-			break;
-		case 16..28:
-			return degrees+'° - North-northeast (NNE)'
-			break;
-		case 28..39:
-			return degrees+'° - Northeast by North (NEbN)'
-			break;
-		case 39..50:
-			return degrees+'° - Northeast (NE)'
-			break;
-		case 50..61:
-			return degrees+'° - Northeast by East (NEbE)'
-			break;
-		case 61..73:
-			return degrees+'° - East-northeast (ENE)'
-			break;
-		case 73..84:
-			return degrees+'° - East by North (EbN)'
-			break;
-		case 84..95:
-			return degrees+'° - East (E)'
-			break;
-		case 95..106:
-			return degrees+'° - East by South (EbS)'
-			break;
-		case 106..118:
-			return degrees+'° - East-southeast (ESE)'
-			break;
-		case 118..129:
-			return degrees+'° - Southeast by East (SEbE)'
-			break;
-		case 129..140:
-			return degrees+'° - Southeast (SE)'
-			break;
-		case 140..151:
-			return degrees+'° - Southeast by South (SEbS)'
-			break;
-		case 151..163:
-			return degrees+'° - South-southeast (SSE)'
-			break;
-		case 163..174:
-			return degrees+'° - South by East (SbE)'
-			break;
-		case 174..185:
-			return degrees+'° - South (S)'
-			break;
-		case 185..196:
-			return degrees+'° - South by West (SbW)'
-			break;
-		case 196..208:
-			return degrees+'° - South-southwest (SSW)'
-			break;
-		case 208..219:
-			return degrees+'° - Southwest by South (SWbS)'
-			break;
-		case 219..230:
-			return degrees+'° - Southwest (SW)'
-			break;
-		case 230..241:
-			return degrees+'° - Southwest by West (SWbW)'
-			break;
-		case 241..253:
-			return degrees+'° - West-southwest (WSW)'
-			break;
-		case 253..264:
-			return degrees+'° - West by South (WbS)'
-			break;
-		case 264..275:
-			return degrees+'° - West (W)'
-			break;
-		case 275..286:
-			return degrees+'° - West by North (WbN)'
-			break;
-		case 286..298:
-			return degrees+'° - West-northwest (WNW)'
-			break;
-		case 298..309:
-			return degrees+'° - Northwest by West (NWbW)'
-			break;
-		case 309..320:
-			return degrees+'° - Northwest (NW)'
-			break;
-		case 320..331:
-			return degrees+'° - Northwest by North (NWbN)'
-			break;
-		case 331..343:
-			return degrees+'° - North-northwest (NNW)'
-			break;
-		case 343..354:
-			return degrees+'° - North by West (NbW)'
-			break;
-		case 354..360:
-			return degrees+'° - North (N)'
-			break;
-	}
-}           
 
 def debugEvent(message, displayEvent) {
 
