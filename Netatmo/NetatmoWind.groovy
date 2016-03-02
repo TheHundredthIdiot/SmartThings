@@ -25,14 +25,21 @@ metadata {
     	capability "Sensor"
     
 		attribute "wind", "number"
-        attribute "WindAngle", "string"
-        attribute "WindStrength", "number"
-        attribute "GustStrength", "number"
- 		attribute "Beaufort", "number"        
+        attribute "WindAngle", "number"
+ 		attribute "WindStrength", "number"
+		attribute "GustStrength", "number"
+		attribute "DecimalUnits", "string"
+
+		attribute "WindAngleText", "string"
+        attribute "WindStrengthText", "string"
+		attribute "GustStrengthText", "string"
+ 		attribute "Beaufort", "string"        
 		attribute "BeaufortDesctiption", "string"
-        attribute "units", "string"
 
 		command "poll"
+        command "windToPref"
+        command "windDirection"
+        command "windToBeaufort"
 	}
 
 	simulator {
@@ -40,11 +47,13 @@ metadata {
 	}
 
 	preferences {
+		input "windUnits", "enum", title: "Report wind in", description: "Wind speed measurement", required: true, options: ['mph':'Miles per Hour (mph)', 'kph':'Kilometres per Hour (kph)', 'fps':'Feet per Second (fps)', 'mps':'Metre per Second (mps)', 'kn':'Knots (kn)']
+    	input "beaufortContext", "enum", title: "Beaufort description for", required: true, options: ['Land':'Land', 'Sea':'Sea']
 	}
 
 	tiles (scale: 2)  {
 		multiAttributeTile(name:"WindStrength", type:"lighting", width: 6, height: 4, decoration: "flat") {
-			tileAttribute("device.WindStrength", key: "PRIMARY_CONTROL") {
+			tileAttribute("device.WindStrengthText", key: "PRIMARY_CONTROL") {
 				attributeState "default",  label: '${currentValue}', icon: "st.Weather.weather1", backgroundColor: "#7eaacd"
  			}
          	tileAttribute("device.Beaufort", key: "SECONDARY_CONTROL") {
@@ -137,11 +146,11 @@ metadata {
  			state "default", label: 'Wind: ${currentValue}'
  		}
 
-		valueTile("GustStrength", "device.GustStrength", width: 5, height: 1, decoration: "flat") {
+		valueTile("GustStrength", "device.GustStrengthText", width: 5, height: 1, decoration: "flat") {
  			state "default", label:'Gusting to: ${currentValue}'
  		}
 		standardTile("refresh", "device.wind", width: 1, height: 1, decoration: "flat") {
- 			state "default", action:"refresh.poll", icon:"st.secondary.refresh"
+ 			state "default", action:"poll", icon:"st.secondary.refresh"
  		}
 
 		main (["WindStrength"])
@@ -152,11 +161,214 @@ metadata {
 	}
 }
 
+def updated() {
+	log.debug ("updated")
+    windToPref()
+    windDirection()
+    windToBeaufort()
+}
+
+def installed() {
+	log.debug ("installed")
+    windToPref()
+    windDirection()
+    windToBeaufort()
+}    
+
 // parse events into attributes
 def parse(String description) {
-	log.debug "Parsing '${description}'"
+	log.debug ("Parsing '${description}'")
 }
 
 def poll() {
+	log.debug "Polling"
 	parent.poll()
 }
+
+def windToPref() {
+	log.debug "In windToPref"
+	def windSpeed
+    def gustSpeed 
+	switch(settings.windUnits) {
+    	case 'kph':
+			windSpeed = device.currentValue("WindStrength")
+            gustSpeed = device.currentValue("GustStrength")
+        	break;
+		case 'mph':
+			windSpeed = (device.currentValue("WindStrength") as float) * 0.621371
+            gustSpeed = (device.currentValue("GustStrength") as float) * 0.621371
+			break;
+    	case 'fps':
+			windSpeed = device.currentValue("WindStrength") * 1.46667
+            gustSpeed = device.currentValue("GustStrength") * 1.46667
+        	break;
+    	case 'mps':
+			windSpeed = device.currentValue("WindStrength")* 0.44704 
+            gustSpeed = device.currentValue("GustStrength")* 0.44704 
+           	break;
+    	case 'kn':
+			windSpeed = device.currentValue("WindStrength")* 0.868976
+            gustSpeed = device.currentValue("GustStrength")* 0.868976
+	 		break;
+	}
+	sendEvent(name: "WindStrengthText", value: String.format("%.${device.currentValue("DecimalUnits")}f", windSpeed as float) + " " + settings.windUnits, unit: settings.windUnits, descriptionText: "Wind Strength Text: ${windSpeed}")
+	sendEvent(name: "GustStrengthText", value: String.format("%.${device.currentValue("DecimalUnits")}f", gustSpeed as float) + " " + settings.windUnits, unit: settings.windUnits, descriptionText: "Gust Strength Text: ${gustSpeed}")
+}
+
+def windDirection() {
+	log.debug ("In windDirection")
+	def degrees = device.currentValue("WindAngle") as int
+    def degreesText = ""
+    switch(degrees) {
+		case 0..5:
+			degreesText = degrees + '° - North (N)'
+			break;
+		case 5..16:
+			degreesText = degrees + '° - North by East (NbE)'
+			break;
+		case 16..28:
+			degreesText = degrees + '° - North-northeast (NNE)'
+			break;
+		case 28..39:
+			degreesText = degrees + '° - Northeast by North (NEbN)'
+			break;
+		case 39..50:
+			degreesText = degrees + '° - Northeast (NE)'
+			break;
+		case 50..61:
+			degreesText = degrees + '° - Northeast by East (NEbE)'
+			break;
+		case 61..73:
+			degreesText = degrees + '° - East-northeast (ENE)'
+			break;
+		case 73..84:
+			degreesText = degrees + '° - East by North (EbN)'
+			break;
+		case 84..95:
+			degreesText = degrees + '° - East (E)'
+			break;
+		case 95..106:
+			degreesText = degrees + '° - East by South (EbS)'
+			break;
+		case 106..118:
+			degreesText = degrees + '° - East-southeast (ESE)'
+			break;
+		case 118..129:
+			degreesText = degrees + '° - Southeast by East (SEbE)'
+			break;
+		case 129..140:
+			degreesText = degrees + '° - Southeast (SE)'
+			break;
+		case 140..151:
+			degreesText = degrees + '° - Southeast by South (SEbS)'
+			break;
+		case 151..163:
+			degreesText = degrees + '° - South-southeast (SSE)'
+			break;
+		case 163..174:
+			degreesText = degrees + '° - South by East (SbE)'
+			break;
+		case 174..185:
+			degreesText = degrees + '° - South (S)'
+			break;
+		case 185..196:
+			degreesText = degrees + '° - South by West (SbW)'
+			break;
+		case 196..208:
+			degreesText = degrees + '° - South-southwest (SSW)'
+			break;
+		case 208..219:
+			degreesText = degrees + '° - Southwest by South (SWbS)'
+			break;
+		case 219..230:
+			degreesText = degrees + '° - Southwest (SW)'
+			break;
+		case 230..241:
+			degreesText = degrees + '° - Southwest by West (SWbW)'
+			break;
+		case 241..253:
+			degreesText = degrees + '° - West-southwest (WSW)'
+			break;
+		case 253..264:
+			degreesText = degrees + '° - West by South (WbS)'
+			break;
+		case 264..275:
+			degreesText = degrees + '° - West (W)'
+			break;
+		case 275..286:
+			degreesText = degrees + '° - West by North (WbN)'
+			break;
+		case 286..298:
+			degreesText = degrees + '° - West-northwest (WNW)'
+			break;
+		case 298..309:
+			degreesText = degrees + '° - Northwest by West (NWbW)'
+			break;
+		case 309..320:
+			degreesText = degrees + '° - Northwest (NW)'
+			break;
+		case 320..331:
+			degreesText = degrees + '° - Northwest by North (NWbN)'
+			break;
+		case 331..343:
+			degreesText = degrees + '° - North-northwest (NNW)'
+			break;
+		case 343..354:
+			degreesText = degrees + '° - North by West (NbW)'
+			break;
+		case 354..360:
+			degreesText = degrees + '° - North (N)'
+			break;
+	}
+	sendEvent(name: "WindAngleText", value: degreesText as String, unit: "", descriptionText: "Wind Angle Text: ${degreesText}")
+}
+
+def windToBeaufort() {
+	log.debug "In windToBeaufort"
+//	Convert to mph to align with original Beaufort scale measurement units (rather than kph)
+	int miles = (device.currentValue("WindStrength") as float) * 0.621371 
+	int beaufortStrength = "0" 
+    switch(miles) {
+		case 1..3:
+			beaufortStrength = 1
+ 			break;
+		case 4..7:
+			beaufortStrength = 2 
+ 			break;
+ 		case 8..12:
+			beaufortStrength = 3
+ 			break;
+ 		case 13..18:
+			beaufortStrength = 4
+ 			break;
+ 		case 19..24:
+			beaufortStrength = 5
+ 			break;
+ 		case 25..31:
+			beaufortStrength = 6
+ 			break;
+ 		case 32..38:
+			beaufortStrength = 7
+ 			break;
+ 		case 39..46:
+			beaufortStrength = 8
+ 			break;
+ 		case 57..54:
+			beaufortStrength = 9                   
+ 			break;
+ 		case 55..63:
+			beaufortStrength = 10                   
+ 			break;
+ 		case 64..72:
+			beaufortStrength = 11
+ 			break;
+        case 73..999:
+          	beaufortStrength = 12
+ 			break;
+ 		default:
+           	beaufortStrength = 0
+ 			break;
+ 	}
+	sendEvent(name: 'Beaufort', 		   value: "${beaufortStrength}", unit: 'bf')
+    sendEvent(name: 'BeaufortDescription', value: "${beaufortStrength} ${settings.beaufortContext}")
+}         
