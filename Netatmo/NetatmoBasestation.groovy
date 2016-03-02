@@ -1,4 +1,4 @@
-	/*
+/*
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
  *
@@ -24,17 +24,27 @@ metadata {
 		capability "Relative Humidity Measurement"
 		capability "Temperature Measurement"
 //      capability "Sound Pressure Level"
+//		capability "Carbon Dioxide Measurement"
 
 		attribute "carbonDioxide", "string"
 		attribute "noise", "string"
 		attribute "pressure", "string"
-		attribute "units", "string"
+		attribute "DecimalUnits", "string"
+
+		attribute "PressureText", "string"
+        
+		command "poll"
+        command "pressureToPref"
 	}
 
 	simulator {
 		// TODO: define status and reply messages here
 	}
 
+	preferences {
+    	input "pressureUnits", "enum", title: "Report pressure in", description: "Pressure Measurement", required: true, options: ['bar':'Bar (bar)', 'mbar':'Millibar (mbar)', 'inHg':'Inch Mercury (inHg)', 'mmHg':'Millimeter Mercury (mmHg)']
+	}
+    
 	tiles (scale: 2)  {
 		multiAttributeTile(name: "temperature", type:"lighting", width: 6, height: 4, decoration: "flat", canChangeIcon: true) {
 			tileAttribute("device.temperature", key: "PRIMARY_CONTROL") {
@@ -109,11 +119,11 @@ metadata {
             state "194", 	 label: 'Noise level: ${currentValue} dB\nSound waves become shock waves, loudest sound possible'
 		}
 
-		valueTile("pressure", "device.pressure", width: 5, height: 1, decoration: "flat") {
+		valueTile("pressure", "device.PressureText", width: 5, height: 1, decoration: "flat") {
  			state "pressure", label:'Pressure: ${currentValue}', unit:"Pressure"
  		}
  		standardTile("refresh", "device.pressure", width: 1, height: 1, decoration: "flat") {
- 			state "default", action:"device.poll", icon:"st.secondary.refresh"
+ 			state "default", action:"poll", icon:"st.secondary.refresh"
  		}
  		main(["temperature"])
  		details(["temperature",
@@ -122,6 +132,16 @@ metadata {
                  "refresh", "pressure"])
 	}
 }
+
+def updated() {
+	log.debug ("updated")
+    pressureToPref()
+}
+
+def installed() {
+	log.debug ("installed")
+    pressureToPref()
+}  
 
 // parse events into attributes
 def parse(String description) {
@@ -137,3 +157,25 @@ def parse(String description) {
 def poll() {
 	parent.poll()
 }
+
+def pressureToPref() {
+	log.debug "In pressureToPref"
+	def pressureValue = 0
+	switch (settings.pressureUnits) {
+    	case 'bar':
+        	pressureValue = device.currentValue("pressure") * 0.001
+			break;        
+        case 'mbar':
+        	pressureValue = device.currentValue("pressure")
+            break;
+        case 'inHg':
+        	pressureValue = device.currentValue("pressure") * 0.0295301
+            break;
+        case 'mmHg':
+	   		pressureValue = device.currentValue("pressure") * 0.750062
+			break;
+	}
+   	sendEvent(name: "PressureText", value: String.format("%.${device.currentValue("DecimalUnits")}f", pressureValue as float) + " " + settings.pressureUnits, unit: settings.pressureUnits, descriptionText: "Pressure: ${pressureValue}")
+}    
+
+
