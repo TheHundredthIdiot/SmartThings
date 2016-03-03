@@ -24,7 +24,6 @@ metadata {
         capability "Relative Humidity Measurement"
 		capability "Temperature Measurement"
 
-        attribute "units", "string"
 }
 
 	simulator {
@@ -46,13 +45,21 @@ metadata {
  		}
         
         standardTile("refresh", "device.pressure", width: 1, height: 1, decoration: "flat") {
- 			state "default", action:"device.poll", icon:"st.secondary.refresh"
+ 			state "default", action:"poll", icon:"st.secondary.refresh"
  		}
  		
         main "temperature"
  		details(["temperature",
                  "refresh", "void"])
 	}
+}
+
+def updated() {
+	log.debug ("updated")
+}
+
+def installed() {
+	log.debug ("installed")
 }
 
 // parse events into attributes
@@ -67,5 +74,6 @@ def parse(String description) {
 }
 
 def poll() {
+	log.debug "Polling"
 	parent.poll()
 }
