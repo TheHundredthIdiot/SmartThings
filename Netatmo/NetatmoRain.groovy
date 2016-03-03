@@ -25,7 +25,6 @@ metadata {
 		attribute "rain", "number"
         attribute "rainSumDay", "number"
         attribute "rainSumHour", "number"
-		attribute "DecimalUnits", "string"
 
         attribute "RainSumDayText", "string"
 		attribute "RainSumHourText", "string"
@@ -95,12 +94,12 @@ metadata {
 
 def updated() {
 	log.debug ("updated")
-	rainToPref()
+	displayText()
 }
 
 def installed() {
 	log.debug ("installed")
-    rainToPref()
+    displayText()
 }    
 
 // parse events into attributes
@@ -112,8 +111,8 @@ def poll() {
 	parent.poll()
 }
 
-def rainToPref() {
-	log.debug "In rainToPref"
+def displayText() {
+	log.debug "In displayText - rainToPref"
    	def rainDay = 0 
 	def rainHour = 0
     if(settings.rainUnits == 'mm') {
@@ -123,6 +122,6 @@ def rainToPref() {
     	rainDay = device.currentValue("rainSumDay") * 0.0393701
     	rainHour = device.currentValue("rainSumHour") * 0.0393701
     }
-   	sendEvent(name: "RainSumDayText", value: String.format("%.${device.currentValue("DecimalUnits")}f", rainDay as float) + " " + settings.rainUnits, unit: settings.rainUnits, descriptionText: "Rain in last day: ${rainDay}")
-   	sendEvent(name: "RainSumHourText", value: String.format("%.${device.currentValue("DecimalUnits")}f", rainHour as float) + " " + settings.rainUnits, unit: settings.rainUnits, descriptionText: "Rain in last hour: ${rainHour}")
+   	sendEvent(name: "RainSumDayText", value: String.format("%.${parent.settings.decimalUnits}f", rainDay as float) + " " + settings.rainUnits, unit: settings.rainUnits, descriptionText: "Rain in last day: ${rainDay}")
+   	sendEvent(name: "RainSumHourText", value: String.format("%.${parent.settings.decimalUnits}f", rainHour as float) + " " + settings.rainUnits, unit: settings.rainUnits, descriptionText: "Rain in last hour: ${rainHour}")
 }
