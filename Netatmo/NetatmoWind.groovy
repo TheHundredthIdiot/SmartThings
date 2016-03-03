@@ -28,7 +28,6 @@ metadata {
         attribute "WindAngle", "number"
  		attribute "WindStrength", "number"
 		attribute "GustStrength", "number"
-		attribute "DecimalUnits", "string"
 
 		attribute "WindAngleText", "string"
         attribute "WindStrengthText", "string"
@@ -163,16 +162,12 @@ metadata {
 
 def updated() {
 	log.debug ("updated")
-    windToPref()
-    windDirection()
-    windToBeaufort()
+    displayText()
 }
 
 def installed() {
 	log.debug ("installed")
-    windToPref()
-    windDirection()
-    windToBeaufort()
+	displayText()
 }    
 
 // parse events into attributes
@@ -181,12 +176,11 @@ def parse(String description) {
 }
 
 def poll() {
-	log.debug "Polling"
 	parent.poll()
 }
 
-def windToPref() {
-	log.debug "In windToPref"
+def displayText() {
+	log.debug "In displayText - windToPref"
 	def windSpeed
     def gustSpeed 
 	switch(settings.windUnits) {
@@ -211,12 +205,10 @@ def windToPref() {
             gustSpeed = device.currentValue("GustStrength")* 0.868976
 	 		break;
 	}
-	sendEvent(name: "WindStrengthText", value: String.format("%.${device.currentValue("DecimalUnits")}f", windSpeed as float) + " " + settings.windUnits, unit: settings.windUnits, descriptionText: "Wind Strength Text: ${windSpeed}")
-	sendEvent(name: "GustStrengthText", value: String.format("%.${device.currentValue("DecimalUnits")}f", gustSpeed as float) + " " + settings.windUnits, unit: settings.windUnits, descriptionText: "Gust Strength Text: ${gustSpeed}")
-}
+	sendEvent(name: "WindStrengthText", value: String.format("%.${parent.settings.decimalUnits}f", windSpeed as float) + " " + settings.windUnits, unit: settings.windUnits, descriptionText: "Wind Strength Text: ${windSpeed}")
+	sendEvent(name: "GustStrengthText", value: String.format("%.${parent.settings.decimalUnits}f", gustSpeed as float) + " " + settings.windUnits, unit: settings.windUnits, descriptionText: "Gust Strength Text: ${gustSpeed}")
 
-def windDirection() {
-	log.debug ("In windDirection")
+	log.debug ("In displayText - windDirection")
 	def degrees = device.currentValue("WindAngle") as int
     def degreesText = ""
     switch(degrees) {
@@ -321,10 +313,8 @@ def windDirection() {
 			break;
 	}
 	sendEvent(name: "WindAngleText", value: degreesText as String, unit: "", descriptionText: "Wind Angle Text: ${degreesText}")
-}
 
-def windToBeaufort() {
-	log.debug "In windToBeaufort"
+	log.debug "In displayText - windToBeaufort"
 //	Convert to mph to align with original Beaufort scale measurement units (rather than kph)
 	int miles = (device.currentValue("WindStrength") as float) * 0.621371 
 	int beaufortStrength = "0" 
