@@ -29,7 +29,6 @@ metadata {
 		attribute "carbonDioxide", "string"
 		attribute "noise", "string"
 		attribute "pressure", "string"
-		attribute "DecimalUnits", "string"
 
 		attribute "PressureText", "string"
         
@@ -135,13 +134,13 @@ metadata {
 
 def updated() {
 	log.debug ("updated")
-    pressureToPref()
+    displayText()
 }
 
 def installed() {
 	log.debug ("installed")
-    pressureToPref()
-}  
+	displayText()
+}
 
 // parse events into attributes
 def parse(String description) {
@@ -158,10 +157,10 @@ def poll() {
 	parent.poll()
 }
 
-def pressureToPref() {
-	log.debug "In pressureToPref"
+def displayText() {
+	log.debug "In displayText - pressureToPref"
 	def pressureValue = 0
-	switch (settings.pressureUnits) {
+ 	switch (settings.pressureUnits) {
     	case 'bar':
         	pressureValue = device.currentValue("pressure") * 0.001
 			break;        
@@ -174,8 +173,10 @@ def pressureToPref() {
         case 'mmHg':
 	   		pressureValue = device.currentValue("pressure") * 0.750062
 			break;
+        default:
+        pressureValue = 999    
 	}
-   	sendEvent(name: "PressureText", value: String.format("%.${device.currentValue("DecimalUnits")}f", pressureValue as float) + " " + settings.pressureUnits, unit: settings.pressureUnits, descriptionText: "Pressure: ${pressureValue}")
+   	sendEvent(name: "PressureText", value: String.format("%.${parent.settings.decimalUnits}f", pressureValue as float) + " " + settings.pressureUnits, unit: settings.pressureUnits, descriptionText: "Pressure: ${pressureValue}")
 }    
 
 
