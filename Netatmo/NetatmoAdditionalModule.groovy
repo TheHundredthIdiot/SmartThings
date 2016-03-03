@@ -25,7 +25,6 @@ metadata {
 		capability "Temperature Measurement"
 
 		attribute "carbonDioxide", "string"
-		attribute "units", "string"        
 	}
 
 	simulator {
@@ -60,7 +59,7 @@ metadata {
  		}
         
         standardTile("refresh", "device.pressure", width: 1, height: 1, decoration: "flat") {
- 			state "default", action:"device.poll", icon:"st.secondary.refresh"
+ 			state "default", action:"poll", icon:"st.secondary.refresh"
  		}
  		
         main "temperature"
@@ -70,6 +69,14 @@ metadata {
 	}
 }
 
+def updated() {
+	log.debug ("updated")
+}
+
+def installed() {
+	log.debug ("installed")
+}
+
 // parse events into attributes
 def parse(String description) {
 	log.debug "Parsing '${description}'"
@@ -77,5 +84,6 @@ def parse(String description) {
 }
 
 def poll() {
+	log.debug "Polling"
 	parent.poll()
 }
