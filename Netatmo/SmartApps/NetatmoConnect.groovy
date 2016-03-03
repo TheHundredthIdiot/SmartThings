@@ -548,7 +548,6 @@ def poll() {
 				child?.sendEvent(name: 'humidity', 		value: data['Humidity'])
 				child?.sendEvent(name: 'pressure', 		value: data['Pressure'] as float)
 				child?.sendEvent(name: 'noise', 		value: data['Noise'])
-		        child?.sendEvent(name: 'DecimalUnits',	value: settings.decimalUnits)
 				child.updated()
 				break;
 			case 'NAModule1':
@@ -561,7 +560,6 @@ def poll() {
 				child?.sendEvent(name: 'WindAngle',		value: data['WindAngle'])
 				child?.sendEvent(name: 'WindStrength',	value: data['WindStrength'] as float)
 				child?.sendEvent(name: 'GustStrength', 	value: data['GustStrength'] as float)
-		        child?.sendEvent(name: 'DecimalUnits',	value: settings.decimalUnits)
                 child.updated()
  				break;
        		case 'NAModule3':
@@ -569,7 +567,6 @@ def poll() {
 				child?.sendEvent(name: 'rain', 			value: data['Rain'])
 				child?.sendEvent(name: 'rainSumHour', 	value: data['sum_rain_1'] as float)
 				child?.sendEvent(name: 'rainSumDay',  	value: data['sum_rain_24'] as float)
-		        child?.sendEvent(name: 'DecimalUnits',	value: settings.decimalUnits)
 				child.updated()
 				break;
 			case 'NAModule4':
