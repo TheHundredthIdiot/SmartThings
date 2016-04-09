@@ -30,7 +30,7 @@ metadata {
 	}
  
 	preferences {
- 		input title: "Movement Sensitivity", description: "Treat movements received within this time period as one - default is 1 second and set cat location the same", displayDuringSetup: false, type: "paragraph", element: "paragraph"
+ 		input title: "Movement Sensitivity", description: "Treat movements received within this time period as one - default is 1 second (set up 'My Cat Location' with the same value)", displayDuringSetup: false, type: "paragraph", element: "paragraph"
 		input "movementSensitivity", "number", title: "Milliseconds", description: "1000 milliseconds", displayDuringSetup: false
 		input title: "Temperature Offset", description: "This feature allows you to correct any temperature variations by selecting an offset", displayDuringSetup: false, type: "paragraph", element: "paragraph"
 		input "tempOffset", "number", title: "Degrees", description: "Adjust temperature by this many degrees", range: "*..*", displayDuringSetup: false

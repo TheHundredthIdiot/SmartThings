@@ -31,8 +31,8 @@ metadata {
 		input "cat2", "string", title: "Second cats name", description: "There is no second cat"
 //		input "cat3", "string", title: "Third cats name", description: "Three, thats pushing it"
 //		input "cat4", "string", title: "Fourth cats name", description: "Are you mad?"
-		input "resetWhen", "enum", title: "Reset when cats are", description: "At Home", options: ['In':'At Home', 'Out':'Out Exploring']
- 		input title: "Movement Sensitivity", description: "Treat movements received within this time period as one - default is 1 second and set cat monitors the same", displayDuringSetup: false, type: "paragraph", element: "paragraph"
+		input "resetWhen", "enum", title: "Reset with cats", description: "At Home", options: ['In':'At Home', 'Out':'Out Exploring']
+ 		input title: "Movement Sensitivity", description: "Treat movements received within this time period as one - default is 1 second (set up 'My Cat Monitor' with the same value)", displayDuringSetup: false, type: "paragraph", element: "paragraph"
 		input "movementSensitivity", "number", title: "Milliseconds", description: "1000 milliseconds", displayDuringSetup: false
 	}
 
