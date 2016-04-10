@@ -49,6 +49,13 @@ metadata {
 			state "default", label: '${currentValue}'
 		}
 
+		valueTile("DateTime", "device.eventTime", inactiveLabel: false, decoration: "flat", width: 5, height: 1) {
+			state "default", label: '${currentValue}'
+		}
+		standardTile("Reset", "command.Reset", inactiveLabel: false, decoration: "flat", width: 1, height: 1) {
+			state "default", action:"Reset", label: '', icon: "st.Office.office8"
+		}
+
 		standardTile("In", "command.CatIn", inactiveLabel: false, decoration: "flat", width: 3, height: 1) {
 			state "default", action:"CatIn", label: '', icon: "st.Seasonal Fall.seasonal-fall-010"
 		}
@@ -56,18 +63,11 @@ metadata {
 			state "default", action:"CatOut", label: '', icon: "st.Outdoor.outdoor1"
 		}
 
-		valueTile("DateTime", "device.eventTime", inactiveLabel: false, decoration: "flat", width: 3, height: 1) {
-			state "default", label: '${currentValue}'
-		}
-		standardTile("Reset", "command.Reset", inactiveLabel: false, decoration: "flat", width: 3, height: 1) {
-			state "default", action:"Reset", label: '', icon: "st.Office.office8"
-		}
-
 		main 	(["Status"])
 		details (["Status", 
         		  "WhereAreThey",
-        	 	  "In", "Out",
-        		  "DateTime", "Reset"])
+        		  "DateTime", "Reset",
+                  "In", "Out",])
 	}
 }
 
@@ -88,7 +88,7 @@ def CatIn() {
        	state.lastOpened = dateNow.getTime()
 		state.catsIn  = state.catsIn + 1
     	state.catsOut = state.catsOut - 1
-    	SendEvent('Came in')
+    	SendEvent('came in')
     } 
 }
 
@@ -99,7 +99,7 @@ def CatOut() {
        	state.lastOpened = dateNow.getTime()
 		state.catsIn  = state.catsIn - 1
 	    state.catsOut = state.catsOut + 1
-	    SendEvent('Went out')
+	    SendEvent('went out')
 	}
 }
 
@@ -117,6 +117,7 @@ private Reset() {
     
     state.lastOpened = new Date()
 	state.lastOpened = state.lastOpened.getTime()
+	state.eventTime  = ""
 
 	SendEvent('Reset')    
 }
@@ -147,7 +148,15 @@ private SendEvent(Type) {
 
 	sendEvent name: "catStatus", value: where 
 	sendEvent name: "catStatusText", value: state.catNames + text
-    sendEvent name: "eventTime", value: Type + " on\n" + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone)
+
+	state.lastEvent = state.eventTime
+
+	if (Type == 'Reset')
+    	state.eventTime = Type  + " on " + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone)
+	else
+		state.eventTime = state.catPrefix + Type  + " on " + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone)
+
+	sendEvent name: "eventTime", value: state.eventTime + "\n" + state.lastEvent
 }
 
 private findCatNames() {
@@ -178,12 +187,15 @@ private findCatNames() {
 	switch (state.catTotal) {
     	case 0:
 			state.catNames = 'Noname the cat is '
+            state.catPrefix = 'Noname '
 		    state.catTotal = 1
             break;
 		case 1:
-            state.catNames = settings.cat1 + ' the cat is '
+            state.catNames = settings.cat1 + ' is '
+        	state.catPrefix = settings.cat1 + ' '
             break;
         case 2:
+        	state.catPrefix = 'One of the cats '
             state.catNames = settings.cat1 + ' and ' + settings.cat2 + ' are '
             break;
  	}

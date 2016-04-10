@@ -60,10 +60,10 @@ metadata {
 				]
 		}
 
-		valueTile("DateTime", "device.eventTime", inactiveLabel: false, decoration: "flat", width: 3, height: 1) {
+		valueTile("DateTime", "device.eventTime", inactiveLabel: false, decoration: "flat", width: 5, height: 1) {
 			state "default", label: '${currentValue}'
 		}
-        standardTile("reset", "command.reset", inactiveLabel: false, decoration: "flat", width: 3, height: 1) {
+        standardTile("reset", "command.reset", inactiveLabel: false, decoration: "flat", width: 1, height: 1) {
 			state "default", action:"reset", label: '', icon: "st.Office.office8"
 		}
 
@@ -281,7 +281,7 @@ private Map getContactResult(value) {
 	if (( value == "open" ) && ( (dateNow.getTime() - state.lastOpened) > findMovementSensitivity() )) {
        state.lastOpened = dateNow.getTime()
  	   state.activationCount = state.activationCount + 1
- 	   sendEvent name: "activations", value: state.activationCount
+ 	   sendEvent()
 	} 
     return [
 		name: 'contact',
@@ -337,8 +337,8 @@ def reset() {
 	state.activationCount = 0
     state.lastOpened = new Date()
 	state.lastOpened = state.lastOpened.getTime()
-    sendEvent(name: "activations", value: state.activationCount, unit: "")
-    sendEvent name: "eventTime", value: "Movements since\n" + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone)
+    state.resetTime = "Last reset on " + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone)
+	sendEvent()
 }
 
 private getEndpointId() {
@@ -370,3 +370,9 @@ private byte[] reverseArray(byte[] array) {
 private findMovementSensitivity() {
     (settings.movementSensitivity != null && settings.movementSensitivity != "") ? settings.movementSensitivity : 1000
 }
+
+private sendEvent() {
+	log.debug "Send Event"
+	sendEvent name: "activations", value: state.activationCount
+    sendEvent name: "eventTime", value: "Last triggered on " + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone) + "\n" + state.resetTime
+}    
