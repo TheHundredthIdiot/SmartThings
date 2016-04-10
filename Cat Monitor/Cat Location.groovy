@@ -88,7 +88,7 @@ def CatIn() {
        	state.lastOpened = dateNow.getTime()
 		state.catsIn  = state.catsIn + 1
     	state.catsOut = state.catsOut - 1
-    	SendEvent()
+    	SendEvent('Came in')
     } 
 }
 
@@ -99,7 +99,7 @@ def CatOut() {
        	state.lastOpened = dateNow.getTime()
 		state.catsIn  = state.catsIn - 1
 	    state.catsOut = state.catsOut + 1
-	    SendEvent()
+	    SendEvent('Went out')
 	}
 }
 
@@ -118,11 +118,11 @@ private Reset() {
     state.lastOpened = new Date()
 	state.lastOpened = state.lastOpened.getTime()
 
-	SendEvent()    
+	SendEvent('Reset')    
 }
 
-private SendEvent() {
-	log.debug "Send Event"
+private SendEvent(Type) {
+	log.debug "Send " + Type + " Event"
 	def where = "Unknown"
 	def text  = "playing clever\nand could be anywhere, totally lost track!"
 
@@ -147,7 +147,7 @@ private SendEvent() {
 
 	sendEvent name: "catStatus", value: where 
 	sendEvent name: "catStatusText", value: state.catNames + text
-    sendEvent name: "eventTime", value: "Last moved on\n" + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone)
+    sendEvent name: "eventTime", value: Type + " on\n" + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone)
 }
 
 private findCatNames() {
