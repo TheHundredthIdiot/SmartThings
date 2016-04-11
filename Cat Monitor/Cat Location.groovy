@@ -88,7 +88,7 @@ def CatIn() {
        	state.lastOpened = dateNow.getTime()
 		state.catsIn  = state.catsIn + 1
     	state.catsOut = state.catsOut - 1
-    	SendEvent('came in')
+    	SendEvent('came home')
     } 
 }
 
@@ -99,7 +99,7 @@ def CatOut() {
        	state.lastOpened = dateNow.getTime()
 		state.catsIn  = state.catsIn - 1
 	    state.catsOut = state.catsOut + 1
-	    SendEvent('went out')
+	    SendEvent('out exploring')
 	}
 }
 
@@ -143,7 +143,7 @@ private SendEvent(Type) {
  	}    
     
 	if (state.catNames == null || state.catNames == "") {
-		state.catNames = "The cat is "
+		state.catNames = "Noname is "
 	}
 
 	sendEvent name: "catStatus", value: where 
@@ -186,7 +186,7 @@ private findCatNames() {
 
 	switch (state.catTotal) {
     	case 0:
-			state.catNames = 'Noname the cat is '
+			state.catNames = 'Noname is '
             state.catPrefix = 'Noname '
 		    state.catTotal = 1
             break;
@@ -195,7 +195,7 @@ private findCatNames() {
         	state.catPrefix = settings.cat1 + ' '
             break;
         case 2:
-        	state.catPrefix = 'One of the cats '
+        	state.catPrefix = 'Someone '
             state.catNames = settings.cat1 + ' and ' + settings.cat2 + ' are '
             break;
  	}

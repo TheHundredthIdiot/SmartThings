@@ -337,7 +337,7 @@ def reset() {
 	state.activationCount = 0
     state.lastOpened = new Date()
 	state.lastOpened = state.lastOpened.getTime()
-    state.resetTime = "Last reset on " + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone)
+    state.resetTime = "Count reset on " + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone)
 	sendEvent()
 }
 
@@ -374,5 +374,8 @@ private findMovementSensitivity() {
 private sendEvent() {
 	log.debug "Send Event"
 	sendEvent name: "activations", value: state.activationCount
-    sendEvent name: "eventTime", value: "Last triggered on " + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone) + "\n" + state.resetTime
+    if (state.activationCount == 0)
+    	sendEvent name: "eventTime", value: state.resetTime
+    else
+    	sendEvent name: "eventTime", value: device.displayName + " on " + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone) + "\n" + state.resetTime
 }    
