@@ -9,7 +9,7 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  *	Author: Andy - TheHundredthIdiot
- *	Date:	April 2016
+ *	Date:	May 2016
  *
  */
  
@@ -352,5 +352,5 @@ private findMovementSensitivity() {
 
 private sendEvent() {
 	log.debug "Send Event"
-   	sendEvent name: "eventTime", value: new Date().format("h:mm:ss", location.timeZone)
+   	sendEvent name: "eventTime", value: new Date().format("HH:mm:ss", location.timeZone)
 }    

@@ -9,7 +9,7 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  *	Author: Andy - TheHundredthIdiot
- *	Date:	April 2016
+ *	Date:	May 2016
  *
  */
  
@@ -114,11 +114,11 @@ private SendEvent(Type) {
 		if (Type == 'In') {
 			state.catsIn  = state.catsIn + 1
     		state.catsOut = state.catsOut - 1
-		    state.InTime  = new Date().format("h:mm:ss", location.timeZone)
+		    state.InTime  = new Date().format("HH:mm:ss", location.timeZone)
 		} else if (Type == 'Out') {
 			state.catsIn  = state.catsIn - 1
 	    	state.catsOut = state.catsOut + 1
-		   	state.OutTime = new Date().format("h:mm:ss", location.timeZone)
+		   	state.OutTime = new Date().format("HH:mm:ss", location.timeZone)
 		}
 
 //		0 - 'Out Exploring',
