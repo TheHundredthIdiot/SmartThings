@@ -44,10 +44,10 @@ metadata {
 		}
 
 		valueTile("InTime", "device.inTime", inactiveLabel: false, decoration: "flat", width: 3, height: 1) {
-			state "default", label: 'In ${currentValue}'
+			state "default", label: 'In: ${currentValue}'
 		}
 		valueTile("OutTime", "device.outTime", inactiveLabel: false, decoration: "flat", width: 3, height: 1) {
-			state "default", label: 'Out ${currentValue}'
+			state "default", label: 'Out: ${currentValue}'
 		}
 
 		standardTile("In", "command.CatIn", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
@@ -98,8 +98,8 @@ private Reset() {
     	state.catsOut = state.catTotal
 	}
     
-	state.inTime  = new Date().format("h:mm ", location.timeZone)
-    state.outTime = state.inTime
+	state.InTime  = "Reset"
+    state.OutTime = state.InTime
     
 	SendEvent('Reset')    
 }
@@ -110,20 +110,21 @@ private SendEvent(Type) {
 	def dateNow = new Date()
 
 	if (((dateNow.getTime() - state.lastOpened) > findSensitivity())) {
+    	state.lastOpened = dateNow.getTime()
 		if (Type == 'In') {
 			state.catsIn  = state.catsIn + 1
     		state.catsOut = state.catsOut - 1
-		    state.InTime  = new Date().format("h:mm ", location.timeZone)
+		    state.InTime  = new Date().format("h:mm:ss", location.timeZone)
 		} else if (Type == 'Out') {
 			state.catsIn  = state.catsIn - 1
 	    	state.catsOut = state.catsOut + 1
-		   	state.OutTime = new Date().format("h:mm ", location.timeZone)
+		   	state.OutTime = new Date().format("h:mm:ss", location.timeZone)
 		}
 
 		sendEvent name: "catStatus", value: state.catsIn
 
 		if (Type == 'In') {
-			sendEvent name: "inTine", value: state.InTime
+			sendEvent name: "inTime", value: state.InTime
 	    } else {
   	     	sendEvent name: "outTime", value: state.OutTime
 		}

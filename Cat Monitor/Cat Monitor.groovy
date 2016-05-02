@@ -41,7 +41,7 @@ metadata {
 		}
         
 		valueTile("Time", "device.eventTime", inactiveLabel: false, width: 3, height: 2) {
-			state "default", label: 'Last\n${currentValue}'
+			state "default", label: 'Last: ${currentValue}'
 		}
  		valueTile("temperature", "device.temperature", inactiveLabel: false, width: 3, height: 2) {
 			state "temperature", label:'${currentValue}°',
@@ -352,5 +352,5 @@ private findMovementSensitivity() {
 
 private sendEvent() {
 	log.debug "Send Event"
-   	sendEvent name: "eventTime", value: new Date().format("h:mm ", location.timeZone)
+   	sendEvent name: "eventTime", value: new Date().format("h:mm:ss", location.timeZone)
 }    
