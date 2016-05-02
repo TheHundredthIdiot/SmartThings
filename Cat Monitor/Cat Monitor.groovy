@@ -21,17 +21,13 @@ metadata {
 		capability "Refresh"
 		capability "Temperature Measurement"
         
-		attribute "activations", "string"
         attribute "eventTime", "string"
         
         command "enrollResponse"
-		command "reset"
         
 	}
  
 	preferences {
- 		input title: "Movement Sensitivity", description: "Treat movements received within this time period as one - default is 1 second (set up 'My Cat Location' with the same value)", displayDuringSetup: false, type: "paragraph", element: "paragraph"
-		input "movementSensitivity", "number", title: "Milliseconds", description: "1000 milliseconds", displayDuringSetup: false
 		input title: "Temperature Offset", description: "This feature allows you to correct any temperature variations by selecting an offset", displayDuringSetup: false, type: "paragraph", element: "paragraph"
 		input "tempOffset", "number", title: "Degrees", description: "Adjust temperature by this many degrees", range: "*..*", displayDuringSetup: false
 	}
@@ -44,9 +40,9 @@ metadata {
 			}
 		}
         
-       	valueTile("ActivationCount", "device.activations", width: 3, height: 2) {
- 			state "default", label: '${currentValue}', backgroundColor: "#6495ed"
-        }
+		valueTile("Time", "device.eventTime", inactiveLabel: false, width: 3, height: 2) {
+			state "default", label: 'Last\n${currentValue}'
+		}
  		valueTile("temperature", "device.temperature", inactiveLabel: false, width: 3, height: 2) {
 			state "temperature", label:'${currentValue}°',
 				backgroundColors:[
@@ -60,13 +56,6 @@ metadata {
 				]
 		}
 
-		valueTile("DateTime", "device.eventTime", inactiveLabel: false, decoration: "flat", width: 5, height: 1) {
-			state "default", label: '${currentValue}'
-		}
-        standardTile("reset", "command.reset", inactiveLabel: false, decoration: "flat", width: 1, height: 1) {
-			state "default", action:"reset", label: '', icon: "st.Office.office8"
-		}
-
 		valueTile("battery", "device.battery", decoration: "flat", inactiveLabel: false, width: 3, height: 1) {
 			state "battery", label:'${currentValue}% battery', unit:""
 		}
@@ -76,8 +65,7 @@ metadata {
 
         main    (["contact"])
 		details (["contact", 
-        		  "ActivationCount", "temperature", 
-                  "DateTime", "reset", 
+        		  "Time", "temperature", 
                   "battery", "refresh"])
 	}
 }
@@ -332,15 +320,6 @@ def enrollResponse() {
 	]
 }
 
-def reset() {
-	log.debug "reset"
-	state.activationCount = 0
-    state.lastOpened = new Date()
-	state.lastOpened = state.lastOpened.getTime()
-    state.resetTime = "Count reset on " + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone)
-	sendEvent()
-}
-
 private getEndpointId() {
 	new BigInteger(device.endpointId, 16).toString()
 }
@@ -373,9 +352,5 @@ private findMovementSensitivity() {
 
 private sendEvent() {
 	log.debug "Send Event"
-	sendEvent name: "activations", value: state.activationCount
-    if (state.activationCount == 0)
-    	sendEvent name: "eventTime", value: state.resetTime
-    else
-    	sendEvent name: "eventTime", value: device.displayName + " on " + new Date().format("dd/MM/YY", location.timeZone) + ' at ' + new Date().format("h:mm a", location.timeZone) + "\n" + state.resetTime
+   	sendEvent name: "eventTime", value: new Date().format("h:mm ", location.timeZone)
 }    
