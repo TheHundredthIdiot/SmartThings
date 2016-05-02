@@ -28,7 +28,7 @@ metadata {
 	}
 
 	preferences {
-		input "catTotal", "string", title: "Number of Cats", description: "1"
+		input "catTotal", "number", title: "Number of Cats", description: "1"
 		input "resetWhen", "enum", title: "Reset with cats", description: "At Home", options: ['In':'At Home', 'Out':'Out Exploring']
  		input title: "Movement Sensitivity", description: "Treat movements received within this time period as one with the initial movement defining direction, default is 1 second", displayDuringSetup: false, type: "paragraph", element: "paragraph"
 		input "sensitivity", "number", title: "Milliseconds", description: "1000 milliseconds", displayDuringSetup: false
@@ -38,8 +38,8 @@ metadata {
     
 		valueTile("Status", "device.catStatus", width: 6, height: 4) {
 			state "default", label: 'Go Find \'Em!', icon:"st.Health & Wellness.health12", backgroundColor: "#e60000"
-			state "1", 		 label: 'On the Move', 	 icon:"st.Transportation.transportation1", backgroundColor: "#ffa81e"
             state "0", 		 label: 'Out Exploring', icon:"st.Outdoor.outdoor1", backgroundColor:"#e63900"
+			state "1", 		 label: 'On the Move', 	 icon:"st.Transportation.transportation1", backgroundColor: "#ffa81e"
             state "2", 		 label: 'At Home',		 icon:"st.Seasonal Fall.seasonal-fall-010", backgroundColor:"#79b821"
 		}
 
@@ -91,11 +91,11 @@ private Reset() {
 	log.debug "Reset"
 
 	if (settings.resetWhen == null || settings.resetWhen == "" || settings.resetWhen == "In") {
-		state.catsIn  = state.catTotal
+		state.catsIn  = settings.catTotal
 	    state.catsOut = 0
 	} else {
     	state.catsIn  = 0
-    	state.catsOut = state.catTotal
+    	state.catsOut = settings.catTotal
 	}
     
 	state.InTime  = "Reset"
@@ -108,7 +108,7 @@ private SendEvent(Type) {
 	log.debug "Send " + Type + " Events"
 
 	def dateNow = new Date()
-
+    
 	if (((dateNow.getTime() - state.lastOpened) > findSensitivity())) {
     	state.lastOpened = dateNow.getTime()
 		if (Type == 'In') {
@@ -121,7 +121,22 @@ private SendEvent(Type) {
 		   	state.OutTime = new Date().format("h:mm:ss", location.timeZone)
 		}
 
-		sendEvent name: "catStatus", value: state.catsIn
+//		0 - 'Out Exploring',
+//		1 - 'On the Move', 	
+//		2 - 'At Home',		
+//		3 - 'Go Find \'Em!'
+
+	    def statusIs = 1
+
+		if (state.catsIn < 0 || state.catsIn > settings.catTotal) {
+        	statusIs = 3
+        } else if (state.catsIn == settings.catTotal) {
+            statusIs = 2    
+        } else if (state.catsIn == 0) {
+        	statusIs = 0
+        }
+       
+		sendEvent name: "catStatus", value: statusIs
 
 		if (Type == 'In') {
 			sendEvent name: "inTime", value: state.InTime
@@ -131,7 +146,7 @@ private SendEvent(Type) {
 	}        
 
 	if (Type == 'Reset') {
-		sendEvent name: "catStatus", value: state.catsIn
+		sendEvent name: "catStatus", value: 2
 		sendEvent name: "inTime", value: state.InTime
     	sendEvent name: "outTime", value: state.OutTime
 	}
