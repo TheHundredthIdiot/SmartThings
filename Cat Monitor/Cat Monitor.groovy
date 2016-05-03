@@ -72,13 +72,11 @@ metadata {
  
 def updated() {
 	log.debug ("updated")
-	reset()						
 	refresh()
 }
 
 def installed() {
 	log.debug ("installed")
-	reset()						
 	refresh()
 }
 
