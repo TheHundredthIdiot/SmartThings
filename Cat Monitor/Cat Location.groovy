@@ -37,10 +37,10 @@ metadata {
 	tiles (scale: 2) {
     
 		valueTile("Status", "device.catStatus", width: 6, height: 4) {
-			state "default", label: 'Go Find \'Em!', icon:"st.Health & Wellness.health12", backgroundColor: "#e60000"
-            state "Out", 	 label: 'Out Exploring', icon:"st.Outdoor.outdoor1", backgroundColor:"#e63900"
-			state "Moving",  label: 'On the Move', 	 icon:"st.Transportation.transportation1", backgroundColor: "#ffa81e"
-            state "Home", 	 label: 'At Home',		 icon:"st.Seasonal Fall.seasonal-fall-010", backgroundColor:"#79b821"
+			state "default", label: 'Go Find \'Em!', icon:"st.Health & Wellness.health12", 		backgroundColor: "#e60000"
+            state "Out", 	 label: 'Out Exploring', icon:"st.Outdoor.outdoor1", 				backgroundColor: "#e63900"
+			state "Moving",  label: 'On the Move', 	 icon:"st.Transportation.transportation1", 	backgroundColor: "#ffa81e"
+            state "Home", 	 label: 'At Home',		 icon:"st.Home.home22", 					backgroundColor: "#79b821"
 		}
 
 		valueTile("InTime", "device.inTime", inactiveLabel: false, decoration: "flat", width: 3, height: 1) {
@@ -151,5 +151,4 @@ private SendEvent(Type) {
 }
 
 private findSensitivity() {
-	(settings.sensitivity != null && settings.sensitivity != "") ? settings.sensitivity : 1000
-}
+	(settings.sensitivity != null && settings.sensitivity != "") ? settings.se

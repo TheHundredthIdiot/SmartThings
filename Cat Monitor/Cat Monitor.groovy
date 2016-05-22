@@ -35,8 +35,8 @@ metadata {
 	tiles(scale: 2) {
 		multiAttributeTile(name:"contact", type: "generic", width: 6, height: 4){
 			tileAttribute ("device.contact", key: "PRIMARY_CONTROL") {
-				attributeState "open", label:'On the Move', icon:"st.contact.contact.open", backgroundColor:"#ffa81e"
-				attributeState "closed", label:'All Quiet', icon:"st.contact.contact.closed", backgroundColor:"#79b821"
+				attributeState "open", label:'On the Move', icon:"st.Transportation.transportation1", backgroundColor:"#ffa81e"		// st.contact.contact.open
+				attributeState "closed", label:'All Quiet', icon:"st.Home.home18", backgroundColor:"#79b821"						// st.contact.contact.closed
 			}
 		}
         
